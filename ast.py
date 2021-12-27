@@ -1,5 +1,6 @@
 from collections import namedtuple as tp
 
+
 Const  = tp("Var", "v")                         # NOQA
 Var    = tp("Var", "v")                         # NOQA
 Op     = tp("Op", ["op", "left", "right"])      # NOQA
@@ -8,8 +9,7 @@ While  = tp("While", ["cond", "body"])          # NOQA
 If     = tp("If", ["cond", "if_", "else_"])     # NOQA
 Seq    = tp("Seq", "seq")                       # NOQA
 Skip   = tp("Skip", "unused", defaults=(None,)) # NOQA
-
-heap = {}
+heap   = {}                                     # NOQA
 
 
 def intrp(exp):
@@ -37,13 +37,3 @@ def intrp(exp):
             while intrp(cond) != 0:
                 intrp(body)
             return
-
-
-s = Seq([Assign("b", Const(0)),
-         Assign("a", Const(10)),
-         While(Var("a"),
-               Seq([Assign("a", Op('-', Var("a"), Const(1))),
-                    Assign("b", Op('+', Var("b"), Const(2)))]))])
-print(s)
-intrp(s)
-print(heap)

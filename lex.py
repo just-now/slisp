@@ -1,23 +1,23 @@
 from collections import namedtuple as tp
 
-List = tp("List", ["seq"])
-Sym  = tp("Sym",  "val")
-Str  = tp("Str",  "val")
-Int  = tp("Int",  "val")
-Spc  = tp("Spc",  "val", defaults=(None,))
+List = tp("List", ["seq"])                      # NOQA
+Sym  = tp("Sym",  "val")                        # NOQA
+Str  = tp("Str",  "val")                        # NOQA
+Int  = tp("Int",  "val")                        # NOQA
+Spc  = tp("Spc",  "val", defaults=(None,))      # NOQA
 
-s = "(a 1 2 (b 3 4 (c (d 1) 5)))"
 
-#                                    sns, rest
-def synnumspc(s: str, T, strcls) -> (str, str):
+def atom(s: str, T, strcls) -> (str, str):  # sns, rest
     i = 0
     while i < len(s) and strcls(s[i]):
-        i+=1
+        i += 1
     return T(s[:i]), s[i:]
 
-sym = lambda s: synnumspc(s, Sym, str.isalpha)
-num = lambda s: synnumspc(s, Int, str.isnumeric)
-spc = lambda s: synnumspc(s, Spc, str.isspace)
+
+def sym(s: str): return atom(s, Sym, str.isalpha)
+def num(s: str): return atom(s, Int, str.isnumeric)
+def spc(s: str): return atom(s, Spc, str.isspace)
+
 
 def sexp(s: str):
     if not s:
@@ -42,7 +42,3 @@ def sexp(s: str):
             else:
                 seq += [x]
         return List(seq), re
-
-print(sexp(s))
-
-
