@@ -1,7 +1,8 @@
 from collections import namedtuple as tp
+from lex import Atom, List, sexp
 
 
-Const  = tp("Var", "v")                         # NOQA
+Const  = tp("Const", "c")                       # NOQA
 Var    = tp("Var", "v")                         # NOQA
 Op     = tp("Op", ["op", "left", "right"])      # NOQA
 Assign = tp("Assign", ["left", "right"])        # NOQA
@@ -37,3 +38,22 @@ def intrp(exp):
             while intrp(cond) != 0:
                 intrp(body)
             return
+
+
+def ast(e):
+    match e:
+        case List([List(l1), *l2] as seq):
+            return Seq([ast(s) for s in seq])
+        case List([Atom("let"), Atom(v), exp]):
+            return Assign(v, ast(exp))
+        case List([Atom("while"), cond, exp]):
+            return While(ast(cond), ast(exp))
+        case List([Atom("+" | "-" as op), left, right]):
+            return Op(op, ast(left), ast(right))
+        case Atom(v):
+            if str.isalpha(v):
+                return Var(v)
+            else:
+                return Const(int(v))
+        case _:
+            return e
