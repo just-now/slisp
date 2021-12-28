@@ -32,7 +32,7 @@ def intrp(exp):
                 intrp(q)
             return
         case If(cond, if_, else_):
-            intrp(if_) if cond else intrp(else_)
+            intrp(if_) if intrp(cond) else intrp(else_)
             return
         case While(cond, body):
             while intrp(cond) != 0:
@@ -48,11 +48,15 @@ def ast(e):
             return Assign(v, ast(exp))
         case List([Atom("while"), cond, exp]):
             return While(ast(cond), ast(exp))
+        case List([Atom("if"), cond, texp, fexp]):
+            return If(ast(cond), ast(texp), ast(fexp))
         case List([Atom("+" | "-" as op), left, right]):
             return Op(op, ast(left), ast(right))
         case Atom(v):
             if str.isalpha(v):
                 return Var(v)
+            elif v[0] == v[-1] == '"':  # strings
+                return Const(v[1:-1].replace("\\", ""))
             else:
                 return Const(int(v))
         case _:

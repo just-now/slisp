@@ -3,9 +3,25 @@ from collections import namedtuple as tp
 
 List = tp("List", ["seq"])
 Atom = tp("Atom", "val")
+prev_atoms = []
 
 
-def isatom(c: str): return not (str.isspace(c) or c in "()")
+def isatom(c: str):
+    if not prev_atoms:
+        if c == '"':
+            prev_atoms.append(c)
+        return not (str.isspace(c) or c in "()")
+    else:
+        if prev_atoms[-1] == '\\':
+            prev_atoms.pop()
+            return True
+        if c == '\\':
+            prev_atoms.append(c)
+            return True
+        if c == '"':
+            assert(prev_atoms.pop() == c)
+            return True
+        return True
 
 
 def sexp(s: str):

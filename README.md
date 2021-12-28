@@ -2,9 +2,9 @@
 
 General workflow:
 ```
-stdin: (foo (bar x) (baz x y z) q) ===> lex:sexp() 
-                                   ===> ast:ast() 
-                                   ===> ast:intrp() 
+stdin: (foo (bar x) (baz x y z) q) ===> lex:sexp()
+                                   ===> ast:ast()
+                                   ===> ast:intrp()
                                    ===> heap {foo: "xyz", bar: "pqr", q: "qwerty"}.
 ```
 
@@ -37,6 +37,10 @@ Seq([Assign('b', Const(0)),
 ```
 
  - ast: intrp() calculates variable values in the heap.
- - future features: strings, ffi.
+ - future features:
+  - ~~strings~~,
+  - `printf()`,
+  - functions,
+  - ffi.
  - uses python3.10 mostly to try patternmatching.
  - WARN: has bugs in favour of simplicity.
