@@ -41,6 +41,8 @@ Seq([Assign('b', Const(0)),
    - ~~strings~~,
    - ~~printf()~~,
    - functions,
+   - lists,
+   - structs,
    - ffi.
  - uses python3.10 mostly to try patternmatching.
  - WARN: has bugs in favour of simplicity.
