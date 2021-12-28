@@ -1,5 +1,6 @@
 from collections import namedtuple as tp
 from lex import Atom, List, sexp
+from lispffi import lispffi
 
 
 Const  = tp("Const", "c")                       # NOQA
@@ -9,6 +10,7 @@ Assign = tp("Assign", ["left", "right"])        # NOQA
 While  = tp("While", ["cond", "body"])          # NOQA
 If     = tp("If", ["cond", "if_", "else_"])     # NOQA
 Seq    = tp("Seq", "seq")                       # NOQA
+Apply  = tp("Apply", ["fun", "params"])         # NOQA
 Skip   = tp("Skip", "unused", defaults=(None,)) # NOQA
 heap   = {}                                     # NOQA
 
@@ -38,6 +40,8 @@ def intrp(exp):
             while intrp(cond) != 0:
                 intrp(body)
             return
+        case Apply(fun, params):
+            return lispffi(fun, [intrp(p) for p in params])
 
 
 def ast(e):
@@ -52,11 +56,16 @@ def ast(e):
             return If(ast(cond), ast(texp), ast(fexp))
         case List([Atom("+" | "-" as op), left, right]):
             return Op(op, ast(left), ast(right))
+        case List([Atom(fun), *params]):
+            return Apply(fun, [ast(p) for p in params])
         case Atom(v):
             if str.isalpha(v):
                 return Var(v)
             elif v[0] == v[-1] == '"':  # strings
-                return Const(v[1:-1].replace("\\", ""))
+                return Const(v[1:-1]
+                             .replace('\\n', '\n')  # [sigh] clean string
+                             .replace('\\t', '\t')
+                             .replace('\\"', '"'))
             else:
                 return Const(int(v))
         case _:

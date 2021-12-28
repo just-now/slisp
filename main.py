@@ -1,12 +1,11 @@
 from sys import exit, stdin
-from ast import ast, intrp, heap
+from yst import ast, intrp
 from lex import sexp
 
 
 def main() -> int:
     st, _ = sexp("".join(stdin.readlines()))
     intrp(ast(st))
-    print(heap)
     return 0
 
 

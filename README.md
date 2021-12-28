@@ -38,9 +38,9 @@ Seq([Assign('b', Const(0)),
 
  - ast: intrp() calculates variable values in the heap.
  - future features:
-  - ~~strings~~,
-  - `printf()`,
-  - functions,
-  - ffi.
+   - ~~strings~~,
+   - ~~printf()~~,
+   - functions,
+   - ffi.
  - uses python3.10 mostly to try patternmatching.
  - WARN: has bugs in favour of simplicity.

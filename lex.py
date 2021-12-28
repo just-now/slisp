@@ -14,13 +14,10 @@ def isatom(c: str):
     else:
         if prev_atoms[-1] == '\\':
             prev_atoms.pop()
-            return True
-        if c == '\\':
+        elif c == '\\':
             prev_atoms.append(c)
-            return True
-        if c == '"':
+        elif c == '"':
             assert(prev_atoms.pop() == c)
-            return True
         return True
 
 
