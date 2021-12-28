@@ -40,7 +40,7 @@ Seq([Assign('b', Const(0)),
  - future features:
    - ~~strings~~,
    - ~~printf()~~,
-   - functions,
+   - ~~functions~~,
    - lists,
    - structs,
    - ffi.
