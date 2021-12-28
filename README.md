@@ -1,5 +1,13 @@
 **A simple lisp interpreter**
 
+General workflow:
+```
+stdin: (foo (bar x) (baz x y z) q) ===> lex:sexp() 
+                                   ===> ast:ast() 
+                                   ===> ast:intrp() 
+                                   ===> heap {foo: "xyz", bar: "pqr", q: "qwerty"}.
+```
+
 Consists of the following components:
  - lex: parses parentheses-tree into `{List|Atom}`-tree:
 
