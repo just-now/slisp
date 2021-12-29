@@ -1,6 +1,6 @@
 from sys import exit, stdin
-from yst import ast, intrp
-from lex import sexp
+from last import ast, intrp
+from llex import sexp
 
 
 def main() -> int:

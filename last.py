@@ -1,6 +1,6 @@
 from collections import namedtuple as tp
-from lex import Atom, List, sexp
-from lispffi import lispffi
+from llex import Atom, List, sexp
+from lffi import lffi
 
 
 Const  = tp("Const", "c")                       # NOQA
@@ -49,7 +49,7 @@ def intrp(exp, stk=None):
                                     [intrp(p, stk) for p in params]))
                 return intrp(foos[fun]["body"], newstack)
             else:
-                return lispffi(fun, [intrp(p, stk) for p in params])
+                return lffi(fun, [intrp(p, stk) for p in params])
         case Fun(fun, params, body):
             foos[fun.v] = {"params": [p.v for p in params], "body": body}
             return
@@ -72,7 +72,7 @@ def ast(e):
         case List([Atom(fun), *params]):
             return Apply(fun, [ast(p) for p in params])
         case Atom(v):
-            if str.isalpha(v):
+            if str.isalpha(v[0]):
                 return Var(v)
             elif v[0] == v[-1] == '"':  # strings
                 return Const(v[1:-1]

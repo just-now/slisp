@@ -2,14 +2,28 @@
  (setq b 0)
  (setq a 10)
 
- (defun foo (a b c)
+ (defun foo2 (a b c)
    (+ a (+ b c)))
 
- (defun fooA ()
+ (defun Con.st ()
    10)
 
- (print "foo={}" (foo 1 (+ b a) (foo 1 2 3)))
- (print "fooA={}" (fooA))
+ (print "foo2={}" (foo2 1 (+ b a) (foo2 1 2 3)))
+ (print "Con.st={}" (Con.st))
+
+ ;; Structs
+ ;;
+ ;; (defstruct List
+ ;;     data
+ ;;     next)
+ ;;
+ ;; (setq x (List 0 (List 1 nil)))
+ ;; (print "x={}\ndata={}\nnext={}" x (List.data x) (List.next x))
+
+ ;; Imports
+ ;;
+ ;; (require "test.lisp")
+
 
  (if a
      (setq c (+ "1\"{}-{}23" "-456"))
