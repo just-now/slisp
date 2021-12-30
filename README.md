@@ -42,7 +42,9 @@ Seq([Assign('b', Const(0)),
    - ~~printf()~~,
    - ~~functions~~,
    - ~~lists (implement on top of structs)~~,
-   - structs,
+   - ~~structs,~~
+   - efficient containers based on pythonish lists, dicts, arrays,
+   - more robustness, assertiveness, etc.
    - imports/modules,
    - ffi.
  - uses python3.10 mostly to try patternmatching.

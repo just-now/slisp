@@ -12,9 +12,13 @@ If     = tp("If", ["cond", "if_", "else_"])     # NOQA
 Seq    = tp("Seq", "seq")                       # NOQA
 Apply  = tp("Apply", ["fun", "params"])         # NOQA
 Fun    = tp("Fun", ["fun", "params", "body"])   # NOQA
+Struct = tp("Struct", ["name", "params"])       # NOQA
 Skip   = tp("Skip", "unused", defaults=(None,)) # NOQA
-heap   = {}                                     # NOQA
+
+
+heap   = {"nil": None}                          # NOQA
 foos   = {}                                     # NOQA
+struct = {}                                     # NOQA
 
 
 def intrp(exp, stk=None):
@@ -39,19 +43,34 @@ def intrp(exp, stk=None):
             intrp(if_, stk) if intrp(cond, stk) else intrp(else_, stk)
             return
         case While(cond, body):
-            while intrp(cond, stk) != 0:
+            while bool(intrp(cond, stk)):
                 intrp(body, stk)
             return
         case Apply(fun, params):
-            if foos.get(fun):
-                assert(len(params) == len(foos[fun]["params"]))
-                newstack = dict(zip(foos[fun]["params"],
+            cons, *acc = fun.split('.')
+            stp = struct.get(cons)
+            foo = foos.get(fun)
+            if stp:
+                if not acc:  # construction of the structure
+                    assert(len(params) == len(stp))
+                    spa = [intrp(p, stk) for p in params]
+                    return {"struct": fun, "params": dict(zip(stp, spa))}
+                else:
+                    assert(len(params) == 1)  # accessor have one parameter only
+                    acc = acc[0]
+                    p = intrp(params[0], stk)
+                    return p["params"][acc]
+            if foo:
+                assert(len(params) == len(foo["params"]))
+                newstack = dict(zip(foo["params"],
                                     [intrp(p, stk) for p in params]))
-                return intrp(foos[fun]["body"], newstack)
-            else:
-                return lffi(fun, [intrp(p, stk) for p in params])
+                return intrp(foo["body"], newstack)
+            return lffi(fun, [intrp(p, stk) for p in params])
         case Fun(fun, params, body):
             foos[fun.v] = {"params": [p.v for p in params], "body": body}
+            return
+        case Struct(name, params) as sx:
+            struct[name.v] = [m.v for m in params]
             return
 
 
@@ -59,6 +78,8 @@ def ast(e):
     match e:
         case List([List(l1), *l2] as seq):
             return Seq([ast(s) for s in seq])
+        case List([Atom("defstruct"), name, *params]):
+            return Struct(ast(name), [ast(m) for m in params])
         case List([Atom("defun"), fun, List(params), body]):
             return Fun(ast(fun), [ast(p) for p in params], ast(body))
         case List([Atom("setq"), Atom(v), exp]):
