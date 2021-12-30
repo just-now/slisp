@@ -25,10 +25,8 @@
 
  (print "--------")
  (while x
-   (
-    (print "@{}" (List.data x))
-    (setq x (List.next x))
-    ))
+   ((print "@{}" (List.data x))
+    (setq x (List.next x))))
 
  ;; Imports
  ;; (require "test.lisp")

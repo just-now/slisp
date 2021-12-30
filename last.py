@@ -50,22 +50,18 @@ def intrp(exp, stk=None):
             cons, *acc = fun.split('.')
             stp = struct.get(cons)
             foo = foos.get(fun)
-            if stp:
-                if not acc:  # construction of the structure
-                    assert(len(params) == len(stp))
-                    spa = [intrp(p, stk) for p in params]
-                    return {"struct": fun, "params": dict(zip(stp, spa))}
-                else:
-                    assert(len(params) == 1)  # accessor have one parameter only
-                    acc = acc[0]
-                    p = intrp(params[0], stk)
-                    return p["params"][acc]
+            spa = [intrp(p, stk) for p in params]
+            if stp and acc:  # accessors have 1 parameter only
+                assert(len(params) == len(spa) == 1)
+                return spa[0]["params"][acc[0]]
+            if stp:  # construction of the structure
+                assert(len(params) == len(stp))
+                return {"struct": fun, "params": dict(zip(stp, spa))}
             if foo:
                 assert(len(params) == len(foo["params"]))
-                newstack = dict(zip(foo["params"],
-                                    [intrp(p, stk) for p in params]))
+                newstack = dict(zip(foo["params"], spa))
                 return intrp(foo["body"], newstack)
-            return lffi(fun, [intrp(p, stk) for p in params])
+            return lffi(fun, spa)
         case Fun(fun, params, body):
             foos[fun.v] = {"params": [p.v for p in params], "body": body}
             return

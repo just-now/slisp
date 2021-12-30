@@ -43,8 +43,10 @@ Seq([Assign('b', Const(0)),
    - ~~functions~~,
    - ~~lists (implement on top of structs)~~,
    - ~~structs,~~
+   - functions as first order citizens, composition.
+   - fds/stdin/out/err,
+   - more robustness, assertiveness, etc,
    - efficient containers based on pythonish lists, dicts, arrays,
-   - more robustness, assertiveness, etc.
    - imports/modules,
    - ffi.
  - uses python3.10 mostly to try patternmatching.
