@@ -43,6 +43,7 @@ Seq([Assign('b', Const(0)),
    - ~~functions~~,
    - ~~lists (implement on top of structs)~~,
    - ~~structs,~~
+   - unary operators like `not',
    - functions as first order citizens, composition.
    - fds/stdin/out/err,
    - more robustness, assertiveness, etc,

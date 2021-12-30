@@ -31,6 +31,11 @@ def intrp(exp, stk=None):
             match op:
                 case '+': return intrp(l, stk) + intrp(r, stk)
                 case '-': return intrp(l, stk) - intrp(r, stk)
+                case '=': return intrp(l, stk) == intrp(r, stk)
+                case '>': return intrp(l, stk) > intrp(r, stk)
+                case '<': return intrp(l, stk) < intrp(r, stk)
+                case '&': return intrp(l, stk) and intrp(r, stk)
+                case '|': return intrp(l, stk) or intrp(r, stk)
         case Assign(l, r):
             heap[l] = intrp(r, stk)
             return
@@ -84,7 +89,8 @@ def ast(e):
             return While(ast(cond), ast(exp))
         case List([Atom("if"), cond, texp, fexp]):
             return If(ast(cond), ast(texp), ast(fexp))
-        case List([Atom("+" | "-" as op), left, right]):
+        case List([Atom("+" | "-" | "=" | ">" | "<"
+                        | "&" | "|" as op), left, right]):
             return Op(op, ast(left), ast(right))
         case List([Atom(fun), *params]):
             return Apply(fun, [ast(p) for p in params])
