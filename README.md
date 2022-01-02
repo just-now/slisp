@@ -43,9 +43,9 @@ Seq([Assign('b', Const(0)),
    - [X] functions,
    - [X] lists (implement on top of structs),
    - [X] structs,
-   - [ ] unary operators like `not',
-   - [ ] functions as first order citizens, composition (apply,
-         compose, lambda, &rest, #')
+   - [X] unary operators like `not',
+   - [ ] functions as first order citizens, composition (~~funcall~~,
+         compose, lambda, ~~&rest~~, ~~#'~~)
    - [ ] fds/stdin/out/err,
    - [ ] more robustness, assertiveness, etc,
    - [ ] efficient containers based on pythonish lists, dicts, arrays,

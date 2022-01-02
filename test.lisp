@@ -23,15 +23,15 @@
 	(List.data x)
 	(List.next x))
 
- (print "---xy----")
- (defun foo3 (xy)
+ (print "--prlist-")
+ (defun prlist (xy)
    (
     ;;(print "xy={}" xy)
     (while xy
       ((print "@{}" (List.data xy))
        (setq xy (List.next xy))))))
 
- (foo3 x)
+ (prlist x)
 
  ;; Imports
  ;; (require "test.lisp")
@@ -51,12 +51,36 @@
  (print "--------")
  (defun foo5 (x y z &rest p)
    ((print "{}-{}-{}" x y z)
-    (foo3 p)))
+    (prlist p)))
 
  (foo5 1 2 3 4 5 6 7 8 9 0)
 
  (print "--list!-")
  (defun list (&rest l)
    l)
- (foo3 (list 1 2 3 4 5))
+ (prlist (list 1 2 3 4 5))
+
+ (print "--not----")
+ (defun not (x)
+   (if x false true))
+
+ (print "f:{}, t:{}" (not false) (not true))
+
+ (print "--apply--")
+ (defun plus10 (a) (+ a 10))
+
+ (defun mapr (foox l)
+   (while l
+     ((print "##{}" (funcall foox (List.data l)))
+      (setq l (List.next l)))))
+
+ (defun map (foox l)
+   (if l
+       (List (funcall foox (List.data l))
+	     (map foox (List.next l)))
+	nil))
+
+ (mapr #plus10 (list 1 2 3 4 5))
+ (prlist (map #plus10 (list 1 2 3 4 5)))
+
 )

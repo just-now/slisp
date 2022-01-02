@@ -17,7 +17,7 @@ Struct = tp("Struct", ["name", "params"])       # NOQA
 Skip   = tp("Skip", "unused", defaults=(None,)) # NOQA
 
 
-heap   = {"nil": None}                          # NOQA
+heap   = {"nil": None, "false": False, "true": True}  # NOQA
 foos   = {}                                     # NOQA
 struct = {}                                     # NOQA
 
@@ -26,6 +26,8 @@ def intrp(exp, stk=None):
     match exp:                                  # NOQA
         case Const(c):
             return c
+        case Var(("#", _)) as lfun:
+            return lfun
         case Var(v):
             return stk[v] if stk and (v in stk) else heap[v]
         case Op(op, l, r):
@@ -45,16 +47,19 @@ def intrp(exp, stk=None):
             return
         case Seq(seq):
             assert(isinstance(seq, list))
+            ret = None
             for q in seq:
-                intrp(q, stk)
-            return
+                ret = intrp(q, stk)
+            return ret
         case If(cond, if_, else_):
-            intrp(if_, stk) if intrp(cond, stk) else intrp(else_, stk)
-            return
+            return intrp(if_, stk) if intrp(cond, stk) else intrp(else_, stk)
         case While(cond, body):
             while bool(intrp(cond, stk)):
                 intrp(body, stk)
             return
+        case Apply("funcall", params):
+            _, fun = intrp(params[0], stk).v
+            return intrp(Apply(fun, [p for p in params[1:]]), stk)
         case Apply(fun, params):
             cons, *acc = fun.split('.')
             stp = struct.get(cons)
@@ -110,8 +115,10 @@ def ast(e):
         case List([Atom(fun), *params]):
             return Apply(fun, [ast(p) for p in params])
         case Atom(v):
-            if str.isalpha(v[0]) or v[0] in "&#":
+            if str.isalpha(v[0]) or v[0] == "&":
                 return Var(v)
+            elif v[0] == "#":
+                return Var(("#", v[1:]))
             elif v[0] == v[-1] == '"':  # strings
                 return Const(v[1:-1]
                              .replace('\\n', '\n')  # [sigh] clean string
