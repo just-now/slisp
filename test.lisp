@@ -32,7 +32,7 @@
  ;; (require "test.lisp")
 
  (print "--------")
- (if (& (> a 0) (= b 0))
+ (if (and (> a 0) (== b 0))
      (setq c (+ "1\"{}-{}23" "-456"))
      (setq d 44))
 
@@ -40,4 +40,4 @@
    ((setq a (- a 1))
     (setq b (+ b 2))))
 
- (print "b={} \t c={} \n \" const={}" b c 3))
+ (print "b={} \t c={} \n \" const={}\t d={}" b c 3 (str[] 3 c)))

@@ -38,17 +38,17 @@ Seq([Assign('b', Const(0)),
 
  - ast: intrp() calculates variable values in the heap.
  - future features:
-   - ~~strings~~,
-   - ~~printf()~~,
-   - ~~functions~~,
-   - ~~lists (implement on top of structs)~~,
-   - ~~structs,~~
-   - unary operators like `not',
-   - functions as first order citizens, composition.
-   - fds/stdin/out/err,
-   - more robustness, assertiveness, etc,
-   - efficient containers based on pythonish lists, dicts, arrays,
-   - imports/modules,
-   - ffi.
+   - [X] strings,
+   - [X] printf(),
+   - [X] functions,
+   - [X] lists (implement on top of structs),
+   - [X] structs,
+   - [ ] unary operators like `not',
+   - [ ] functions as first order citizens, composition.
+   - [ ] fds/stdin/out/err,
+   - [ ] more robustness, assertiveness, etc,
+   - [ ] efficient containers based on pythonish lists, dicts, arrays,
+   - [ ] imports/modules,
+   - [ ] ffi.
  - uses python3.10 mostly to try patternmatching.
  - WARN: has bugs in favour of simplicity.
