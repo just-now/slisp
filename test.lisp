@@ -23,10 +23,15 @@
 	(List.data x)
 	(List.next x))
 
- (print "--------")
- (while x
-   ((print "@{}" (List.data x))
-    (setq x (List.next x))))
+ (print "---xy----")
+ (defun foo3 (xy)
+   (
+    ;;(print "xy={}" xy)
+    (while xy
+      ((print "@{}" (List.data xy))
+       (setq xy (List.next xy))))))
+
+ (foo3 x)
 
  ;; Imports
  ;; (require "test.lisp")
@@ -40,4 +45,18 @@
    ((setq a (- a 1))
     (setq b (+ b 2))))
 
- (print "b={} \t c={} \n \" const={}\t d={}" b c 3 (str[] 3 c)))
+ (print "b={} \t c={} \n \" const={}\t d={}"
+	b c 3 (str[] 3 c))
+
+ (print "--------")
+ (defun foo5 (x y z &rest p)
+   ((print "{}-{}-{}" x y z)
+    (foo3 p)))
+
+ (foo5 1 2 3 4 5 6 7 8 9 0)
+
+ (print "--list!-")
+ (defun list (&rest l)
+   l)
+ (foo3 (list 1 2 3 4 5))
+)

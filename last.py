@@ -1,6 +1,7 @@
 from collections import namedtuple as tp
 from llex import Atom, List, sexp
 from lffi import lffi
+from functools import reduce
 
 
 Const  = tp("Const", "c")                       # NOQA
@@ -39,7 +40,8 @@ def intrp(exp, stk=None):
                 case "and": return intrp(l, stk) and intrp(r, stk)
                 case "or": return intrp(l, stk) or intrp(r, stk)
         case Assign(l, r):
-            heap[l] = intrp(r, stk)
+            out = stk if stk else heap
+            out[l] = intrp(r, stk)
             return
         case Seq(seq):
             assert(isinstance(seq, list))
@@ -65,12 +67,23 @@ def intrp(exp, stk=None):
                 assert(len(params) == len(stp))
                 return {"struct": fun, "params": dict(zip(stp, spa))}
             if foo:
+                if foo["&rest"]:
+                    pn = len(foo["params"])-1
+                    rest, params = params[pn:], params[:pn]
+                    params += [reduce(lambda x, y: Apply('List', [y, x]),
+                                      reversed(rest), Var("nil"))]
+                    spa = [intrp(p, stk) for p in params]
+
                 assert(len(params) == len(foo["params"]))
                 newstack = dict(zip(foo["params"], spa))
                 return intrp(foo["body"], newstack)
             return lffi(fun, spa)
         case Fun(fun, params, body):
-            foos[fun.v] = {"params": [p.v for p in params], "body": body}
+            params = [p.v for p in params]
+            rcount = params.count("&rest")
+            assert(rcount in [0, 1] and (rcount != 1 or params[-2] == "&rest"))
+            foos[fun.v] = {"params": [p for p in params if p != "&rest"],
+                           "body": body, "&rest": rcount == 1}
             return
         case Struct(name, params) as sx:
             struct[name.v] = [m.v for m in params]
@@ -97,7 +110,7 @@ def ast(e):
         case List([Atom(fun), *params]):
             return Apply(fun, [ast(p) for p in params])
         case Atom(v):
-            if str.isalpha(v[0]):
+            if str.isalpha(v[0]) or v[0] in "&#":
                 return Var(v)
             elif v[0] == v[-1] == '"':  # strings
                 return Const(v[1:-1]
