@@ -11,19 +11,13 @@
  (print "foo2={}" (foo2 1 (+ b a) (foo2 1 2 3)))
  (print "Con-st={}" (Con-st))
 
- ;; Structs
+ (print "--struct-")
  (defstruct List
      data
      next)
 
- (print "--------")
- (setq x (List (foo2 1 2 3) (List 1 nil)))
- (print "x={}\ndata={}\nnext={}"
-	x
-	(List.data x)
-	(List.next x))
-
  (print "--prlist-")
+ (setq x (List (foo2 1 2 3) (List 1 nil)))
  (defun prlist (xy)
    (
     ;;(print "xy={}" xy)
@@ -76,4 +70,11 @@
 
  (prlist (map #plus10 (list 1 2 3 4 5)))
 
+ (print "--lambda-")
+ (setq lam1 (lambda (x) (+ 10 x)))
+ (print "@@{}" (funcall lam1 10))
+ (print "@@{}"
+	(funcall (lambda (x y) (+ y (+ 10 x))) 10 20))
+
+ (funcall (lambda (&rest p) (prlist p)) 1 2 3 4 5)
 )

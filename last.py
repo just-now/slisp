@@ -60,10 +60,12 @@ def intrp(exp, stk=None):
             _, fun = intrp(params[0], stk).v
             return intrp(Apply(fun, [p for p in params[1:]]), stk)
         case Apply(fun, params):
+            if isinstance(fun, str):
+                foo = heap.get(fun)
+            else:  # lambda
+                foo, fun = fun, ""
             cons, *acc = fun.split('.')
             stp = struct.get(cons)
-            foos = heap
-            foo = foos.get(fun)
             spa = [intrp(p, stk) for p in params]
             if stp and acc:  # accessors have 1 parameter only
                 assert(len(params) == len(spa) == 1)
@@ -87,9 +89,12 @@ def intrp(exp, stk=None):
             params = [p.v for p in params]
             rcount = params.count("&rest")
             assert(rcount in [0, 1] and (rcount != 1 or params[-2] == "&rest"))
-            foos = heap
-            foos[fun.v] = {"params": [p for p in params if p != "&rest"],
-                           "body": body, "&rest": rcount == 1}
+            ret = {"params": [p for p in params if p != "&rest"],
+                   "body": body, "&rest": rcount == 1}
+            if fun.v != "lambda":
+                heap[fun.v] = ret
+            else:
+                return Var(("#lambda", ret))
             return
         case Struct(name, params) as sx:
             struct[name.v] = [m.v for m in params]
@@ -104,6 +109,8 @@ def ast(e):
             return Struct(ast(name), [ast(m) for m in params])
         case List([Atom("defun"), fun, List(params), body]):
             return Fun(ast(fun), [ast(p) for p in params], ast(body))
+        case List([Atom("lambda"), List(params), body]):
+            return Fun(Var("lambda"), [ast(p) for p in params], ast(body))
         case List([Atom("setq"), Atom(v), exp]):
             return Assign(v, ast(exp))
         case List([Atom("while"), cond, exp]):
