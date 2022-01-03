@@ -68,19 +68,12 @@
 
  (print "--apply--")
  (defun plus10 (a) (+ a 10))
-
- (defun mapr (foox l)
-   (while l
-     ((print "##{}" (funcall foox (List.data l)))
-      (setq l (List.next l)))))
-
  (defun map (foox l)
    (if l
        (List (funcall foox (List.data l))
 	     (map foox (List.next l)))
 	nil))
 
- (mapr #plus10 (list 1 2 3 4 5))
  (prlist (map #plus10 (list 1 2 3 4 5)))
 
 )

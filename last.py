@@ -18,7 +18,6 @@ Skip   = tp("Skip", "unused", defaults=(None,)) # NOQA
 
 
 heap   = {"nil": None, "false": False, "true": True}  # NOQA
-foos   = {}                                     # NOQA
 struct = {}                                     # NOQA
 
 
@@ -63,6 +62,7 @@ def intrp(exp, stk=None):
         case Apply(fun, params):
             cons, *acc = fun.split('.')
             stp = struct.get(cons)
+            foos = heap
             foo = foos.get(fun)
             spa = [intrp(p, stk) for p in params]
             if stp and acc:  # accessors have 1 parameter only
@@ -87,6 +87,7 @@ def intrp(exp, stk=None):
             params = [p.v for p in params]
             rcount = params.count("&rest")
             assert(rcount in [0, 1] and (rcount != 1 or params[-2] == "&rest"))
+            foos = heap
             foos[fun.v] = {"params": [p for p in params if p != "&rest"],
                            "body": body, "&rest": rcount == 1}
             return
