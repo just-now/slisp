@@ -49,7 +49,7 @@ Seq([Assign('b', Const(0)),
    - [X] curry, closures,
    - [X] function composition,
    - [ ] fds/stdin/out/err,
-   - [ ] imports/modules,
+   - [ ] ~~imports/modules (cat is sufficient)~~,
    - [ ] more robustness, assertiveness, etc,
    - [ ] efficient containers based on pythonish lists, dicts, arrays,
    - [ ] ffi.

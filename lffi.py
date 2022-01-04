@@ -1,7 +1,7 @@
 def lffi(fun: str, params: list):
     # print(f"{fun=}, {params=}")
     if fun == "print":
-        print(params[0].format(*params[1:]))
+        print(params[0].format(*params[1:]), end="")
     elif fun == "str[]":
         assert(len(params) == 2 and isinstance(params[1], str))
         return params[1][params[0]]

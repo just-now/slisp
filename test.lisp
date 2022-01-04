@@ -8,29 +8,30 @@
  (defun Con-st ()
    10)
 
- (print "foo2={}" (foo2 1 (+ b a) (foo2 1 2 3)))
- (print "Con-st={}" (Con-st))
+ (print "foo2={}\n" (foo2 1 (+ b a) (foo2 1 2 3)))
+ (print "Con-st={}\n" (Con-st))
 
- (print "--struct-")
+ (print "--struct-\n")
  (defstruct List
      data
      next)
 
- (print "--prlist-")
+ (print "--prlist-\n")
  (setq x (List (foo2 1 2 3) (List 1 nil)))
  (defun prlist (xy)
    (
     ;;(print "xy={}" xy)
     (while xy
-      ((print "@{}" (List.data xy))
-       (setq xy (List.next xy))))))
+      ((print "@{} " (List.data xy))
+       (setq xy (List.next xy))))
+    (print "\n")))
 
  (prlist x)
 
  ;; Imports
  ;; (require "test.lisp")
 
- (print "--------")
+ (print "--------\n")
  (if (and (> a 0) (== b 0))
      (setq c (+ "1\"{}-{}23" "-456"))
      (setq d 44))
@@ -39,53 +40,62 @@
    ((setq a (- a 1))
     (setq b (+ b 2))))
 
- (print "b={} \t c={} \n \" const={}\t d={}"
-	b c 3 (str[] 3 c))
+ (print "b={} \t c={} \n \" const={}\t d={}\n"
+        b c 3 (str[] 3 c))
 
- (print "--------")
+ (print "--------\n")
  (defun foo5 (x y z &rest p)
-   ((print "{}-{}-{}" x y z)
+   ((print "{}-{}-{}\n" x y z)
     (prlist p)))
 
  (foo5 1 2 3 4 5 6 7 8 9 0)
 
- (print "--list!-")
+ (print "--list!-\n")
  (defun list (&rest l)
    l)
  (prlist (list 1 2 3 4 5))
 
- (print "--not----")
+ (print "--not----\n")
  (defun not (x)
    (if x false true))
 
- (print "f:{}, t:{}" (not false) (not true))
+ (print "f:{}, t:{}\n" (not false) (not true))
 
- (print "--map--")
+ (print "--map--\n")
  (defun plus10 (a) (+ a 10))
- (defun map (foox l)
+ (defun map (pred l)
    (if l
-       (List (funcall foox (List.data l))
-	     (map foox (List.next l)))
-	nil))
-
+       (List (funcall pred (List.data l))
+             (map pred (List.next l)))
+        nil))
  (prlist (map #plus10 (list 1 2 3 4 5)))
 
- (print "--lambda-")
+ (print "--filter--\n")
+ (defun filter (pred l)
+   (if l
+       (if (funcall pred (List.data l))
+           (List (List.data l) (filter pred (List.next l)))
+           (filter pred (List.next l)))
+        nil))
+ (defun gt3 (a) (> a 3))
+ (prlist (filter #gt3 (list 1 2 3 4 5)))
+
+ (print "--lambda-\n")
  (setq lam1 (lambda (x) (+ 5 x)))
- (print "@@{}" (funcall lam1 10))
- (print "@@{}"
-	(funcall (lambda (x y) (+ y (+ 10 x))) 10 20))
+ (print "@@{}\n" (funcall lam1 10))
+ (print "@@{}\n"
+        (funcall (lambda (x y) (+ y (+ 10 x))) 10 20))
 
  (funcall (lambda (&rest p) (prlist p)) 1 2 3 4 5)
  (prlist (map (lambda (x) (+ x 10))
-		(list 1 2 3 4 5)))
+                (list 1 2 3 4 5)))
 
- (print "--append(ffi)--")
+ (print "--append(ffi)--\n")
  (prlist (append
-	  (list 1 2 3 4 5)
-	  (list 10 20 30)))
+          (list 1 2 3 4 5)
+          (list 10 20 30)))
 
- (print "--curry--")
+ (print "--curry--\n")
  (defun curry (fn &rest args)
    (lambda (&rest remaining-args)
      (apply fn (append args remaining-args))))
@@ -93,19 +103,21 @@
  (defun addx (a b)
    (+ a b))
 
- (print "@@{}" (funcall (curry #addx 2) (+ 2 3)))
+ (print "@@{}\n" (funcall (curry #addx 2) (+ 2 3)))
 
- (print "--compose--")
+ (print "--compose--\n")
  (defun compose (&rest foos)
    (lambda (x)
      ((while foos
-	((setq foo  (List.data foos))
-	 (setq x    (funcall foo x))
-	 (setq foos (List.next foos))))
+        ((setq foo  (List.data foos))
+         (setq x    (funcall foo x))
+         (setq foos (List.next foos))))
       x)))
 
- (print "@@{}" (funcall (compose #plus10
-				 lam1
-				 #plus10)
-			13))
+ (print "@@{}\n" (funcall (compose
+                         (lambda (x) (* x 10))
+                         ;;(lambda (x) (+ x 10))
+                         (curry #addx 10)
+                         (lambda (x) (/ x 10)))
+                        13))
 )

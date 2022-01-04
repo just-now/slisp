@@ -30,7 +30,7 @@ def intrp(exp, stk=None, clo=None):
         case Var(v):
             if stk and (v in stk):
                 return stk[v]
-            elif clo:
+            elif clo and (v in clo):
                 return clo[v]
             else:
                 return heap[v]
@@ -38,6 +38,8 @@ def intrp(exp, stk=None, clo=None):
             match op:
                 case "+": return intrp(l, stk, clo) + intrp(r, stk, clo)
                 case "-": return intrp(l, stk, clo) - intrp(r, stk, clo)
+                case "*": return intrp(l, stk, clo) * intrp(r, stk, clo)
+                case "/": return intrp(l, stk, clo) / intrp(r, stk, clo)
                 case "==": return intrp(l, stk, clo) == intrp(r, stk, clo)
                 case ">": return intrp(l, stk, clo) > intrp(r, stk, clo)
                 case "<": return intrp(l, stk, clo) < intrp(r, stk, clo)
@@ -98,7 +100,11 @@ def intrp(exp, stk=None, clo=None):
 
                 assert(len(params) == len(foo["params"]))
                 newstack = dict(zip(foo["params"], spa))
-                newclo = foo.get("closure")  # WARN: newclo = {closure} + {clo}
+                # newclo = {}
+                # fooclo = foo.get("closure") or {}
+                # newclo.update(fooclo)
+                # newclo.update(clo)
+                newclo = foo.get("closure")  # look up ^^^
                 return intrp(foo["body"], newstack, newclo)
             return lffi(fun, spa)
         case Fun(fun, params, body):
@@ -134,7 +140,7 @@ def ast(e):
             return While(ast(cond), ast(exp))
         case List([Atom("if"), cond, texp, fexp]):
             return If(ast(cond), ast(texp), ast(fexp))
-        case List([Atom("+" | "-" | "==" | ">" | "<" | "<=" | ">="
+        case List([Atom("+" | "-" | "==" | ">" | "<" | "<=" | ">=" | "*" | "/"
                         | "and" | "or" as op), left, right]):
             return Op(op, ast(left), ast(right))
         case List([Atom(fun), *params]):
