@@ -47,11 +47,11 @@ Seq([Assign('b', Const(0)),
    - [X] functions as first order citizens (funcall, &rest, #'),
    - [X] lambda,
    - [X] curry, closures,
-   - [ ] function composition,
+   - [X] function composition,
    - [ ] fds/stdin/out/err,
+   - [ ] imports/modules,
    - [ ] more robustness, assertiveness, etc,
    - [ ] efficient containers based on pythonish lists, dicts, arrays,
-   - [ ] imports/modules,
    - [ ] ffi.
  - uses python3.10 mostly to try patternmatching.
  - WARN: has bugs in favour of simplicity.

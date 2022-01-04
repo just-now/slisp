@@ -71,7 +71,7 @@
  (prlist (map #plus10 (list 1 2 3 4 5)))
 
  (print "--lambda-")
- (setq lam1 (lambda (x) (+ 10 x)))
+ (setq lam1 (lambda (x) (+ 5 x)))
  (print "@@{}" (funcall lam1 10))
  (print "@@{}"
 	(funcall (lambda (x y) (+ y (+ 10 x))) 10 20))
@@ -93,6 +93,19 @@
  (defun addx (a b)
    (+ a b))
 
- ;; (print "@@{}" (curry #addx 2))
  (print "@@{}" (funcall (curry #addx 2) (+ 2 3)))
+
+ (print "--compose--")
+ (defun compose (&rest foos)
+   (lambda (x)
+     ((while foos
+	((setq foo  (List.data foos))
+	 (setq x    (funcall foo x))
+	 (setq foos (List.next foos))))
+      x)))
+
+ (print "@@{}" (funcall (compose #plus10
+				 lam1
+				 #plus10)
+			13))
 )
