@@ -60,15 +60,15 @@
 
  (print "f:{}, t:{}" (not false) (not true))
 
- (print "--apply--")
+ (print "--map--")
  (defun plus10 (a) (+ a 10))
- (defun apply (foox l)
+ (defun map (foox l)
    (if l
        (List (funcall foox (List.data l))
-	     (apply foox (List.next l)))
+	     (map foox (List.next l)))
 	nil))
 
- (prlist (apply #plus10 (list 1 2 3 4 5)))
+ (prlist (map #plus10 (list 1 2 3 4 5)))
 
  (print "--lambda-")
  (setq lam1 (lambda (x) (+ 10 x)))
@@ -77,7 +77,7 @@
 	(funcall (lambda (x y) (+ y (+ 10 x))) 10 20))
 
  (funcall (lambda (&rest p) (prlist p)) 1 2 3 4 5)
- (prlist (apply (lambda (x) (+ x 10))
+ (prlist (map (lambda (x) (+ x 10))
 		(list 1 2 3 4 5)))
 
  (print "--append(ffi)--")
@@ -86,12 +86,13 @@
 	  (list 10 20 30)))
 
  (print "--curry--")
- ;; (defun curry (fn &rest args)
- ;;   (lambda (&rest remaining-args)
- ;;     (apply fn (append args remaining-args))))
+ (defun curry (fn &rest args)
+   (lambda (&rest remaining-args)
+     (apply fn (append args remaining-args))))
 
- ;; (defun addx (a b)
- ;;   (+ a b))
+ (defun addx (a b)
+   (+ a b))
 
- ;; (print "@@{}" (funcall (curry #addx 2) 1))
+ ;; (print "@@{}" (curry #addx 2))
+ (print "@@{}" (funcall (curry #addx 2) (+ 2 3)))
 )

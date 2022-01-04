@@ -21,44 +21,59 @@ heap   = {"nil": None, "false": False, "true": True}  # NOQA
 struct = {}                                     # NOQA
 
 
-def intrp(exp, stk=None):
+def intrp(exp, stk=None, clo=None):
     match exp:                                  # NOQA
         case Const(c):
             return c
         case Var(("#", _)) as lfun:
             return lfun
         case Var(v):
-            return stk[v] if stk and (v in stk) else heap[v]
+            if stk and (v in stk):
+                return stk[v]
+            elif clo:
+                return clo[v]
+            else:
+                return heap[v]
         case Op(op, l, r):
             match op:
-                case "+": return intrp(l, stk) + intrp(r, stk)
-                case "-": return intrp(l, stk) - intrp(r, stk)
-                case "==": return intrp(l, stk) == intrp(r, stk)
-                case ">": return intrp(l, stk) > intrp(r, stk)
-                case "<": return intrp(l, stk) < intrp(r, stk)
-                case ">=": return intrp(l, stk) >= intrp(r, stk)
-                case "<=": return intrp(l, stk) <= intrp(r, stk)
-                case "and": return intrp(l, stk) and intrp(r, stk)
-                case "or": return intrp(l, stk) or intrp(r, stk)
+                case "+": return intrp(l, stk, clo) + intrp(r, stk, clo)
+                case "-": return intrp(l, stk, clo) - intrp(r, stk, clo)
+                case "==": return intrp(l, stk, clo) == intrp(r, stk, clo)
+                case ">": return intrp(l, stk, clo) > intrp(r, stk, clo)
+                case "<": return intrp(l, stk, clo) < intrp(r, stk, clo)
+                case ">=": return intrp(l, stk, clo) >= intrp(r, stk, clo)
+                case "<=": return intrp(l, stk, clo) <= intrp(r, stk, clo)
+                case "and": return intrp(l, stk, clo) and intrp(r, stk, clo)
+                case "or": return intrp(l, stk, clo) or intrp(r, stk, clo)
         case Assign(l, r):
             out = stk if stk else heap
-            out[l] = intrp(r, stk)
+            out[l] = intrp(r, stk, clo)
             return
         case Seq(seq):
             assert(isinstance(seq, list))
             ret = None
             for q in seq:
-                ret = intrp(q, stk)
+                ret = intrp(q, stk, clo)
             return ret
         case If(cond, if_, else_):
-            return intrp(if_, stk) if intrp(cond, stk) else intrp(else_, stk)
+            return intrp(if_, stk, clo) if intrp(cond, stk, clo) \
+                else intrp(else_, stk, clo)
         case While(cond, body):
-            while bool(intrp(cond, stk)):
-                intrp(body, stk)
+            while bool(intrp(cond, stk, clo)):
+                intrp(body, stk, clo)
             return
         case Apply("funcall", params):
-            _, fun = intrp(params[0], stk).v
-            return intrp(Apply(fun, [p for p in params[1:]]), stk)
+            _, fun = intrp(params[0], stk, clo).v
+            return intrp(Apply(fun, [p for p in params[1:]]), stk, clo)
+        case Apply("apply", params):
+            assert(len(params) == 2)
+            _, fun = intrp(params[0], stk, clo).v
+            lfunps = intrp(params[1], stk, clo)
+            afunps = []
+            while lfunps:
+                afunps += [Const(lfunps["params"]["data"])]
+                lfunps = lfunps["params"]["next"]
+            return intrp(Apply(fun, afunps), stk, clo)
         case Apply(fun, params):
             if isinstance(fun, str):
                 foo = heap.get(fun)
@@ -66,9 +81,7 @@ def intrp(exp, stk=None):
                 foo, fun = fun, ""
             cons, *acc = fun.split('.')
             stp = struct.get(cons)
-            #print("###", params)
-            spa = [intrp(p, stk) for p in params]
-            #print("@@@", spa)
+            spa = [intrp(p, stk, clo) for p in params]
             if stp and acc:  # accessors have 1 parameter only
                 assert(len(params) == len(spa) == 1)
                 return spa[0]["params"][acc[0]]
@@ -81,11 +94,12 @@ def intrp(exp, stk=None):
                     rest, params = params[pn:], params[:pn]
                     params += [reduce(lambda x, y: Apply('List', [y, x]),
                                       reversed(rest), Var("nil"))]
-                    spa = [intrp(p, stk) for p in params]
+                    spa = [intrp(p, stk, clo) for p in params]
 
                 assert(len(params) == len(foo["params"]))
                 newstack = dict(zip(foo["params"], spa))
-                return intrp(foo["body"], newstack)
+                newclo = foo.get("closure") # warn: shall be newclo = {closure} + {clo}
+                return intrp(foo["body"], newstack, newclo)
             return lffi(fun, spa)
         case Fun(fun, params, body):
             params = [p.v for p in params]
@@ -96,6 +110,7 @@ def intrp(exp, stk=None):
             if fun.v != "lambda":
                 heap[fun.v] = ret
             else:
+                ret["closure"] = stk
                 return Var(("#lambda", ret))
             return
         case Struct(name, params) as sx:
