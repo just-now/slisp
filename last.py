@@ -66,7 +66,9 @@ def intrp(exp, stk=None):
                 foo, fun = fun, ""
             cons, *acc = fun.split('.')
             stp = struct.get(cons)
+            #print("###", params)
             spa = [intrp(p, stk) for p in params]
+            #print("@@@", spa)
             if stp and acc:  # accessors have 1 parameter only
                 assert(len(params) == len(spa) == 1)
                 return spa[0]["params"][acc[0]]
