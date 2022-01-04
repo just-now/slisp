@@ -98,7 +98,7 @@ def intrp(exp, stk=None, clo=None):
 
                 assert(len(params) == len(foo["params"]))
                 newstack = dict(zip(foo["params"], spa))
-                newclo = foo.get("closure") # warn: shall be newclo = {closure} + {clo}
+                newclo = foo.get("closure")  # WARN: newclo = {closure} + {clo}
                 return intrp(foo["body"], newstack, newclo)
             return lffi(fun, spa)
         case Fun(fun, params, body):

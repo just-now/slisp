@@ -37,7 +37,7 @@ Seq([Assign('b', Const(0)),
 ```
 
  - ast: intrp() calculates variable values in the heap.
- - future features:
+ - features:
    - [X] strings,
    - [X] printf(),
    - [X] functions,
