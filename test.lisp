@@ -28,9 +28,6 @@
 
  (prlist x)
 
- ;; Imports
- ;; (require "test.lisp")
-
  (print "--------\n")
  (if (and (> a 0) (== b 0))
      (setq c (+ "1\"{}-{}23" "-456"))

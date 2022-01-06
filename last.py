@@ -17,8 +17,10 @@ Struct = tp("Struct", ["name", "params"])       # NOQA
 Skip   = tp("Skip", "unused", defaults=(None,)) # NOQA
 
 
-heap   = {"nil": None, "false": False, "true": True}  # NOQA
-struct = {}                                     # NOQA
+heap   = {"nil": None, "false": False, "true": True}
+struct = {}
+ops    = {op: eval(f"lambda a,b: a {op} b") for op in
+          "+.-.*./.==.>.<.>=.<=.and.or".split('.')}
 
 
 def intrp(exp, stk=None, clo=None):
@@ -35,18 +37,7 @@ def intrp(exp, stk=None, clo=None):
             else:
                 return heap[v]
         case Op(op, l, r):
-            match op:
-                case "+": return intrp(l, stk, clo) + intrp(r, stk, clo)
-                case "-": return intrp(l, stk, clo) - intrp(r, stk, clo)
-                case "*": return intrp(l, stk, clo) * intrp(r, stk, clo)
-                case "/": return intrp(l, stk, clo) / intrp(r, stk, clo)
-                case "==": return intrp(l, stk, clo) == intrp(r, stk, clo)
-                case ">": return intrp(l, stk, clo) > intrp(r, stk, clo)
-                case "<": return intrp(l, stk, clo) < intrp(r, stk, clo)
-                case ">=": return intrp(l, stk, clo) >= intrp(r, stk, clo)
-                case "<=": return intrp(l, stk, clo) <= intrp(r, stk, clo)
-                case "and": return intrp(l, stk, clo) and intrp(r, stk, clo)
-                case "or": return intrp(l, stk, clo) or intrp(r, stk, clo)
+            return ops[op](intrp(l, stk, clo), intrp(r, stk, clo))
         case Assign(l, r):
             out = stk if stk else heap
             out[l] = intrp(r, stk, clo)
@@ -100,11 +91,7 @@ def intrp(exp, stk=None, clo=None):
 
                 assert(len(params) == len(foo["params"]))
                 newstack = dict(zip(foo["params"], spa))
-                # newclo = {}
-                # fooclo = foo.get("closure") or {}
-                # newclo.update(fooclo)
-                # newclo.update(clo)
-                newclo = foo.get("closure")  # look up ^^^
+                newclo = foo.get("closure")
                 return intrp(foo["body"], newstack, newclo)
             return lffi(fun, spa)
         case Fun(fun, params, body):
