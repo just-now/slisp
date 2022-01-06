@@ -21,6 +21,12 @@ def isatom(c: str):
         return True
 
 
+def clean(s: str) -> str:
+    return s.replace('\\n', '\n') \
+            .replace('\\t', '\t') \
+            .replace('\\"', '"')
+
+
 def sexp(s: str):
     if not s:
         return [], ''
@@ -36,4 +42,4 @@ def sexp(s: str):
             seq += [x]
             x, re = sexp(re)
         return List(seq), re
-    return Atom("".join(tw(isatom, s))), "".join(dw(isatom, s))
+    return Atom(clean("".join(tw(isatom, s)))), "".join(dw(isatom, s))

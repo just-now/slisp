@@ -34,8 +34,7 @@ def intrp(exp, stk=None, clo=None):
                 return stk[v]
             elif clo and (v in clo):
                 return clo[v]
-            else:
-                return heap[v]
+            return heap[v]
         case Op(op, l, r):
             return ops[op](intrp(l, stk, clo), intrp(r, stk, clo))
         case Assign(l, r):
@@ -127,21 +126,17 @@ def ast(e):
             return While(ast(cond), ast(exp))
         case List([Atom("if"), cond, texp, fexp]):
             return If(ast(cond), ast(texp), ast(fexp))
-        case List([Atom("+" | "-" | "==" | ">" | "<" | "<=" | ">=" | "*" | "/"
-                        | "and" | "or" as op), left, right]):
-            return Op(op, ast(left), ast(right))
         case List([Atom(fun), *params]):
-            return Apply(fun, [ast(p) for p in params])
+            aps = [ast(p) for p in params]
+            is_op = fun in ops and len(aps) == 2
+            return Op(fun, *aps) if is_op else Apply(fun, aps)
         case Atom(v):
             if str.isalpha(v[0]) or v[0] == "&":
                 return Var(v)
-            elif v[0] == "#":
+            elif v[0] == "#":           # lambda, func as a parameter
                 return Var(("#", v[1:]))
             elif v[0] == v[-1] == '"':  # strings
-                return Const(v[1:-1]
-                             .replace('\\n', '\n')  # [sigh] clean string
-                             .replace('\\t', '\t')
-                             .replace('\\"', '"'))
+                return Const(v[1:-1])
             else:
                 return Const(int(v))
         case _:
