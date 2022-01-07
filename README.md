@@ -50,7 +50,7 @@ Seq([Assign('b', Const(0)),
    - [X] function composition,
    - [X] fds/stdin/stdout,
    - [ ] ~~imports/modules (cat is sufficient)~~,
-   - [ ] sscanf()-ish thingm
+   - [ ] sscanf()-ish thing,
    - [ ] more robustness, assertiveness, etc,
    - [ ] efficient containers based on pythonish lists, dicts, arrays,
    - [ ] ffi.
