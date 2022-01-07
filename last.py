@@ -16,9 +16,8 @@ Fun    = tp("Fun", ["fun", "params", "body"])   # NOQA
 Struct = tp("Struct", ["name", "params"])       # NOQA
 Skip   = tp("Skip", "unused", defaults=(None,)) # NOQA
 
-
+struct = {}                                     # NOQA
 heap   = {"nil": None, "false": False, "true": True}
-struct = {}
 ops    = {op: eval(f"lambda a,b: a {op} b") for op in
           "+.-.*./.==.>.<.>=.<=.and.or".split('.')}
 
@@ -67,44 +66,36 @@ def intrp(exp, stk=None, clo=None):
                 lfunps = lfunps["params"]["next"]
             return intrp(Apply(fun, afunps), stk, clo)
         case Apply(fun, params):
-            if isinstance(fun, str):
-                foo = heap.get(fun)
-            else:  # lambda
-                foo, fun = fun, ""
-            cons, *acc = fun.split('.')
-            stp = struct.get(cons)
-            spa = [intrp(p, stk, clo) for p in params]
-            if stp and acc:  # accessors have 1 parameter only
-                assert(len(params) == len(spa) == 1)
-                return spa[0]["params"][acc[0]]
-            if stp:  # construction of the structure
-                assert(len(params) == len(stp))
-                return {"struct": fun, "params": dict(zip(stp, spa))}
-            if foo:
-                if foo["&rest"]:
-                    pn = len(foo["params"])-1
-                    rest, params = params[pn:], params[:pn]
-                    params += [reduce(lambda x, y: Apply('List', [y, x]),
-                                      reversed(rest), Var("nil"))]
-                    spa = [intrp(p, stk, clo) for p in params]
+            foo, fun = (heap.get(fun), fun) if isinstance(fun, str) else (fun, "")
+            scons, *saccr = fun.split('.')
+            structure = struct.get(scons)
 
+            if foo and foo.get("&rest"):
+                pn = len(foo["params"])-1
+                rest, params, nil = reversed(params[pn:]), params[:pn], Var("nil")
+                params += [reduce(lambda p, ps: Apply('List', [ps, p]), rest, nil)]
+
+            iparams = [intrp(p, stk, clo) for p in params]
+            if saccr:      # accessors have 1 parameter only
+                assert(len(params) == len(iparams) == 1)
+                return iparams[0]["params"][saccr[0]]
+            if structure:  # construction of the structure
+                assert(len(params) == len(structure))
+                return {"struct": fun, "params": dict(zip(structure, iparams))}
+            if foo:
                 assert(len(params) == len(foo["params"]))
-                newstack = dict(zip(foo["params"], spa))
+                newstack = dict(zip(foo["params"], iparams))
                 newclo = foo.get("closure")
                 return intrp(foo["body"], newstack, newclo)
-            return lffi(fun, spa)
+            return lffi(fun, iparams)
         case Fun(fun, params, body):
             params = [p.v for p in params]
             rcount = params.count("&rest")
             assert(rcount in [0, 1] and (rcount != 1 or params[-2] == "&rest"))
-            ret = {"params": [p for p in params if p != "&rest"],
-                   "body": body, "&rest": rcount == 1}
-            if fun.v != "lambda":
-                heap[fun.v] = ret
-            else:
-                ret["closure"] = stk
-                return Var(("#lambda", ret))
-            return
+            heap[fun.v] = {"params": [p for p in params if p != "&rest"],
+                           "body": body, "&rest": rcount == 1,
+                           "closure": stk if fun.v == "lambda" else None}
+            return Var((f"#{fun.v}", heap[fun.v]))
         case Struct(name, params) as sx:
             struct[name.v] = [m.v for m in params]
             return

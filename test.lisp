@@ -117,4 +117,26 @@
                          (curry #addx 10)
                          (lambda (x) (/ x 10)))
                         13))
+
+ (print "----tree---\n")
+ (defstruct Tree
+   data
+   left
+   right)
+ (setq tree (Tree 1
+		  (Tree 2
+			(Tree 22 nil nil)
+			(Tree 23 nil nil))
+		  (Tree 3
+			(Tree 32 nil nil)
+			(Tree 33 nil nil))))
+ (defun prtree (node)
+   (if (not node)
+       nil
+       ((print "@@{} " (Tree.data node))
+	(prtree (Tree.left  node))
+	(prtree (Tree.right node)))))
+
+ (prtree tree)
+ (print "\n")
 )
