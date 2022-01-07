@@ -48,10 +48,12 @@ Seq([Assign('b', Const(0)),
    - [X] lambda,
    - [X] curry, closures,
    - [X] function composition,
-   - [ ] fds/stdin/out/err,
+   - [X] fds/stdin/stdout,
    - [ ] ~~imports/modules (cat is sufficient)~~,
+   - [ ] sscanf()-ish thingm
    - [ ] more robustness, assertiveness, etc,
    - [ ] efficient containers based on pythonish lists, dicts, arrays,
    - [ ] ffi.
  - uses python3.10 mostly to try patternmatching.
  - WARN: has bugs in favour of simplicity.
+ - UPD 7/01/22: prototype is almost finished, sscanf()-ish thing could be the last missing part.

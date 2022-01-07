@@ -2,6 +2,31 @@ def lffi(fun: str, params: list):
     # print(f"{fun=}, {params=}")
     if fun == "print":
         print(params[0].format(*params[1:]), end="")
+    elif fun == "format":
+        return params[0].format(*params[1:])
+    elif fun == "open":
+        assert(len(params) == 2)
+        return open(params[0], params[1])
+    elif fun == "close":
+        assert(len(params) == 1)
+        fd = params[0]
+        fd.close()
+        return
+    elif fun == "read":
+        assert(len(params) == 2)
+        fd = params[0]
+        sz = params[1]
+        return fd.read(sz)
+    elif fun == "write":
+        assert(len(params) == 2)
+        fd = params[0]
+        text = params[1]
+        return fd.write(text)
+    elif fun == "readline":
+        assert(len(params) == 2)
+        fd = params[0]
+        sz = params[1]
+        return fd.readline(sz)
     elif fun == "str[]":
         assert(len(params) == 2 and isinstance(params[1], str))
         return params[1][params[0]]

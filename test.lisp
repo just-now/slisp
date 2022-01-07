@@ -139,4 +139,18 @@
 
  (prtree tree)
  (print "\n")
+
+ ;; This part is tricky and there's no real error handling here.
+ ;; Example: file not found
+ (print "---- io ---\n")
+
+ (setq file (open "test.lisp" "r"))
+ (setq cont (read file 64))
+ (print "{}\n" cont)
+ (close file)
+
+ (setq file (open "out.xxx" "w"))
+ (write file cont)
+ (write file (format "\n~Q.E.D~{}\n" 7012022))
+ (close file)
 )
