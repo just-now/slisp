@@ -1,7 +1,7 @@
 from collections import namedtuple as tp
-from llex import Atom, List, sexp
-from lffi import lffi
 from functools import reduce
+from llex import Atom, List
+from lffi import lffi
 
 
 Const  = tp("Const", "c")                       # NOQA
@@ -31,9 +31,7 @@ def intrp(exp, stk=None, clo=None):
         case Var(v):
             if stk and (v in stk):
                 return stk[v]
-            elif clo and (v in clo):
-                return clo[v]
-            return heap[v]
+            return clo[v] if (clo and (v in clo)) else heap[v]
         case Op(op, l, r):
             return ops[op](intrp(l, stk, clo), intrp(r, stk, clo))
         case Assign(l, r):
@@ -42,13 +40,12 @@ def intrp(exp, stk=None, clo=None):
             return
         case Seq(seq):
             assert(isinstance(seq, list))
-            ret = None
             for q in seq:
                 ret = intrp(q, stk, clo)
             return ret
         case If(cond, if_, else_):
-            return intrp(if_, stk, clo) if intrp(cond, stk, clo) \
-                else intrp(else_, stk, clo)
+            if_else = if_ if intrp(cond, stk, clo) else else_
+            return intrp(if_else, stk, clo)
         case While(cond, body):
             while bool(intrp(cond, stk, clo)):
                 intrp(body, stk, clo)
@@ -59,8 +56,7 @@ def intrp(exp, stk=None, clo=None):
         case Apply("apply", params):
             assert(len(params) == 2)
             _, fun = intrp(params[0], stk, clo).v
-            lfunps = intrp(params[1], stk, clo)
-            afunps = []
+            afunps, lfunps = [], intrp(params[1], stk, clo)
             while lfunps:
                 afunps += [Const(lfunps["params"]["data"])]
                 lfunps = lfunps["params"]["next"]
