@@ -13,6 +13,7 @@ ffit = {
     "str-join": lambda sep, ls: sep.join(from_list(ls)),
     "str-split": lambda *s: to_list(str.split(*s)),
     "str": str, "int": int, "float": float,
+    "err?": lambda p: isinstance(p, int)
 }
 
 

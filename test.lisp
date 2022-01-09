@@ -138,21 +138,22 @@
  (prtree tree)
  (print "\n")
 
- ;; This part is tricky and there's no real error handling here.
- (print "---- io ---\n")
-
+ (print "---- io/r ---\n")
  (setq file (file-open "test.lisp" "r"))
  (setq cont (file-read file 64))
  (print "{}\n" cont)
  (file-close file)
 
+ (print "---- io/w ---\n")
  (setq file (file-open "out.xxx" "w"))
+ (print "err?={}\n" (err? file))
  (file-write file cont)
  (file-write file (format "\n~Q.E.D~{}\n" 7012022))
  (file-close file)
 
  (print "---- io-fail ---\n")
  (setq file (file-open "xxx" "r"))
+ (print "err?={}\n" (err? file))
  (print "result=-{}\n" file)
 
  (print "---- str/list ---\n")
