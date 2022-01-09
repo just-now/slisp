@@ -47,10 +47,8 @@
  (foo5 1 2 3 4 5 6 7 8 9 0)
 
  (print "--list!-\n")
- (defun list (&rest l)
-   l)
+ (defun list (&rest l) l)
  (prlist (list 1 2 3 4 5))
- ;; (print "------>{}\n" (list 1 2 3))
 
  (print "--not----\n")
  (defun not (x)

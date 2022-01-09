@@ -49,11 +49,12 @@ Seq([Assign('b', Const(0)),
    - [X] curry, closures,
    - [X] function composition,
    - [X] fds/stdin/stdout,
-   - [ ] ~~imports/modules (cat is sufficient)~~,
-   - [ ] sscanf()-ish thing,
-   - [ ] more robustness, assertiveness, etc,
+   - [X] ~~sscanf()-ish thing~~ str.split() alike parser + str/int/float,
    - [ ] efficient containers based on pythonish lists, dicts, arrays,
-   - [ ] ffi.
+   - [ ] ~~imports/modules (cat is sufficient)~~,
+   - [ ] more robustness, assertiveness, etc,
+   - [X] ffi, at least extendable code.
  - uses python3.10 mostly to try patternmatching.
  - WARN: has bugs in favour of simplicity.
- - UPD 7/01/22: prototype is almost finished, sscanf()-ish thing could be the last missing part.
+ - ~~UPD 7/01/22: prototype is almost finished, sscanf()-ish thing could be the last missing part.~~
+ - UPD 9/01/22: prototype is almost finished, will try not to work more on this.

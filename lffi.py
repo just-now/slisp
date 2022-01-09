@@ -12,9 +12,7 @@ ffit = {
     "file-readline": _io.TextIOWrapper.readline,
     "str-join": lambda sep, ls: sep.join(from_list(ls)),
     "str-split": lambda *s: to_list(str.split(*s)),
-    "str": str,
-    "int": int,
-    "float": float,
+    "str": str, "int": int, "float": float,
 }
 
 
