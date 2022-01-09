@@ -125,6 +125,6 @@ def ast(e):
             elif v[0] == v[-1] == '"':  # strings
                 return Const(v[1:-1])
             else:
-                return Const(int(v))
+                return Const(float(v)) if '.' in v else Const(int(v))
         case _:
             return e

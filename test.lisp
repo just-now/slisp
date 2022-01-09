@@ -37,8 +37,7 @@
    ((setq a (- a 1))
     (setq b (+ b 2))))
 
- (print "b={} \t c={} \n \" const={}\t d={}\n"
-        b c 3 (str[] 3 c))
+ (print "b={} \t c={} \n \" const={}\n" b c 3)
 
  (print "--------\n")
  (defun foo5 (x y z &rest p)
@@ -51,6 +50,7 @@
  (defun list (&rest l)
    l)
  (prlist (list 1 2 3 4 5))
+ ;; (print "------>{}\n" (list 1 2 3))
 
  (print "--not----\n")
  (defun not (x)
@@ -141,16 +141,28 @@
  (print "\n")
 
  ;; This part is tricky and there's no real error handling here.
- ;; Example: file not found
  (print "---- io ---\n")
 
- (setq file (open "test.lisp" "r"))
- (setq cont (read file 64))
+ (setq file (file-open "test.lisp" "r"))
+ (setq cont (file-read file 64))
  (print "{}\n" cont)
- (close file)
+ (file-close file)
 
- (setq file (open "out.xxx" "w"))
- (write file cont)
- (write file (format "\n~Q.E.D~{}\n" 7012022))
- (close file)
+ (setq file (file-open "out.xxx" "w"))
+ (file-write file cont)
+ (file-write file (format "\n~Q.E.D~{}\n" 7012022))
+ (file-close file)
+
+ (print "---- io-fail ---\n")
+ (setq file (file-open "xxx" "r"))
+ (print "result=-{}\n" file)
+
+ (print "---- str/list ---\n")
+ (prlist (to-list "1234567890"))
+ (print "@{}\n" (str-join "" (to-list "1234567890")))
+
+ (prlist (str-split "one1 two2 three3"))
+
+ (print "---- int/list ---\n")
+ (print "@{}\n" (str-join "" (map #str (list 1 2.2 3 4 5 6))))
 )
