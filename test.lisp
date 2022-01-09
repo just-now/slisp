@@ -109,12 +109,10 @@
          (setq foos (List.next foos))))
       x)))
 
- (print "@@{}\n" (funcall (compose
-                         (lambda (x) (* x 10))
-                         ;;(lambda (x) (+ x 10))
-                         (curry #addx 10)
-                         (lambda (x) (/ x 10)))
-                        13))
+ (print "@@{}\n" (funcall (compose (lambda (x) (* x 10))
+				   (curry #addx 10)
+				   (lambda (x) (/ x 10)))
+                          13))
 
  (print "----tree---\n")
  (defstruct Tree
@@ -157,7 +155,10 @@
  (print "result=-{}\n" file)
 
  (print "---- str/list ---\n")
- (prlist (to-list "1234567890"))
+ (prlist (filter (lambda (x) (> x 5))
+		 (map (compose #int #float)
+		      (to-list "1234567890"))))
+
  (print "@{}\n" (str-join "" (to-list "1234567890")))
 
  (prlist (str-split "one1 two2 three3"))
