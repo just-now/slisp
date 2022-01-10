@@ -1,10 +1,12 @@
 (defstruct Const  c)
 (defstruct Var    v)
 (defstruct Op     op left right)
+(defstruct Fun    fun seq)
 (defstruct Assign left right)
 (defstruct While  cond body)
 (defstruct If     cond if_ else_)
 (defstruct Seq    seq)
+
 (defstruct LList  seq)
 (defstruct LAtom  val)
 (defstruct Ret    parsed rest)
@@ -75,13 +77,11 @@
 		      (is (nth 0 (LList.seq e)) "LAtom"))))
 
        (
-
 	(if (and (not ret)
 		 (== "setq" (LAtom.val (nth 0 (LList.seq e)))))
 	    (
 	     ;; (print "\n\n ##> LEFT  {}\n\n" (LAtom.val (nth 1 (LList.seq e))))
 	     ;; (print "\n\n ##> RIGHT {}\n\n" (ast (nth 2 (LList.seq e))))
-
 	     (setq ret (Assign (LAtom.val (nth 1 (LList.seq e)))
 			       (ast (nth 2 (LList.seq e)))))
 	     ))
@@ -96,8 +96,19 @@
 	(if (and (not ret)
 		 (== "if" (LAtom.val (nth 0 (LList.seq e)))))
 	    (
-	     ;; TODO: implement!
-	     (setq ret e)
+	     (setq ret (If (ast (nth 1 (LList.seq e)))
+			   (ast (nth 2 (LList.seq e)))
+			   (ast (nth 3 (LList.seq e)))))
+	     ))
+
+	(if (and (not ret)
+		 (str-isalpha (nth 0 (to-list (Var.v (ast (nth 0 (LList.seq e))))))))
+	    (
+	     ;; (print "\n\n ##> FUN    {}\n\n" (ast (nth 0 (LList.seq e))))
+	     ;; (print "\n\n ##> LEFT  {}\n\n" (ast (nth 1 (LList.seq e))))
+	     ;; (print "\n\n ##> RIGHT {}\n\n" (ast (nth 2 (LList.seq e))))
+	     (setq ret (Fun (Var.v (ast (nth 0 (LList.seq e))))
+			    (map #ast (from 1 (LList.seq e)))))
 	     ))
 
 	(if (not ret)
@@ -117,8 +128,8 @@
 	    (is e "LAtom"))
        (
 	(setq ret (if (str-isnumeric (LAtom.val e))
-		      (Const   (LAtom.val e))
-		      (Var (LAtom.val e))))
+		      (Const (LAtom.val e))
+		      (Var   (LAtom.val e))))
 	))
 
 
@@ -161,14 +172,22 @@
 	    ((setq ret true)
 	     (print "{}, {}\n" (intrp (Op.left e)) (intrp (Op.right e)))))
 
-	(if (== op "+")
-	    (setq ret (+ (intrp (Op.left e)) (intrp (Op.right e)))))
+	(if (== op "+")		(setq ret (+  (intrp (Op.left e)) (intrp (Op.right e)))))
+	(if (== op "-")		(setq ret (-  (intrp (Op.left e)) (intrp (Op.right e)))))
+	(if (== op ">")		(setq ret (>  (intrp (Op.left e)) (intrp (Op.right e)))))
+	(if (== op "==")	(setq ret (== (intrp (Op.left e)) (intrp (Op.right e)))))
 
-	(if (== op "-")
-	    (setq ret (- (intrp (Op.left e)) (intrp (Op.right e)))))
+	))
 
-	(if (== op ">")
-	    (setq ret (> (intrp (Op.left e)) (intrp (Op.right e)))))
+   (if (and (not ret) (is e "Fun"))
+       (
+	;; (print "## fun={}\n"     (Fun.fun e))
+	;; (print "## rest={}\n"    (Fun.seq e))
+	(setq ret true)
+	(setq fun (Fun.fun e))
+	(setq seq (Fun.seq e))
+
+	(if (== fun "print")		(list-print (map #intrp seq)))
 
 	))
 
@@ -179,6 +198,19 @@
 
 	(while (intrp condition)
 	  (intrp body))
+
+	(setq ret true)
+	))
+
+   (if (and (not ret) (is e "If"))
+       (
+	(setq condition (If.cond  e))
+	(setq if_       (If.if_   e))
+	(setq else_     (If.else_ e))
+
+	(if (intrp condition)
+	    (intrp if_)
+	    (intrp else_))
 
 	(setq ret true)
 	))

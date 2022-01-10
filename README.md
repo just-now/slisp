@@ -58,3 +58,4 @@ Seq([Assign('b', Const(0)),
  - WARN: has bugs in favour of simplicity.
  - ~~UPD 7/01/22: prototype is almost finished, sscanf()-ish thing could be the last missing part.~~
  - UPD 9/01/22: prototype is almost finished, will try not to work more on this.
+ - UPD 10/01/22: produced calc-lisp language written in slisp. That's it folks.

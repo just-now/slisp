@@ -6,5 +6,11 @@
    ((setq a (- a 1))
     (setq b (+ b 2))))
 
- (print a b)
+ (if (== b 20)
+     ((print a b)
+      (print a)
+      (print b)
+      (print 10)
+      )
+     (print 0 0))
 )
