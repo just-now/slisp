@@ -6,5 +6,5 @@
    ((setq a (- a 1))
     (setq b (+ b 2))))
 
- (print "a={} b={}\n" a b)
+ (print a b)
 )

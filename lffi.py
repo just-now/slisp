@@ -17,6 +17,7 @@ ffit = {
     "to-list": lambda l: to_list(l),
     "str-isspace": str.isspace,
     "str-isalpha": str.isalpha,
+    "str-isnumeric": str.isnumeric,
 }
 
 

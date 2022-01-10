@@ -35,9 +35,14 @@ def intrp(exp, stk=None, clo=None):
                 return stk[v]
             return clo[v] if (clo and (v in clo)) else heap[v]
         case Op(op, l, r):
-            return ops[op](intrp(l, stk, clo), intrp(r, stk, clo))
+            left, right = intrp(l, stk, clo), None
+            if not op in ["and", "or"] or \
+               ((op == "and" and left) or (op == "or" and not left)):
+                right = intrp(r, stk, clo)
+            return ops[op](left, right)
         case Assign(l, r):
-            out = stk if stk else heap
+            # out = stk if stk else heap
+            out = heap if l in heap else (stk if stk else heap)
             out[l] = intrp(r, stk, clo)
             return
         case Seq(seq):
@@ -75,8 +80,16 @@ def intrp(exp, stk=None, clo=None):
 
             iparams = [intrp(p, stk, clo) for p in params]
             if saccr:      # accessors have 1 parameter only
-                assert(len(params) == len(iparams) == 1)
-                return iparams[0]["params"][saccr[0]]
+                assert(len(saccr) in [1, 2])
+                assert(len(params) == len(iparams) == len(saccr))
+                if len(saccr) == 2:
+                    assert(saccr[1] == "set" and
+                           saccr[0] in iparams[0]["params"] and
+                           iparams[0]["struct"] == scons)
+                    iparams[0]["params"][saccr[0]] = iparams[1]
+                    return iparams[0]
+                else:
+                    return iparams[0]["params"][saccr[0]]
             if structure:  # construction of the structure
                 assert(len(params) == len(structure))
                 return {"struct": fun, "params": dict(zip(structure, iparams))}

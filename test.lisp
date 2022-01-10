@@ -10,8 +10,8 @@
 (print "const={}\n" (const))
 
 (print "--prlist-\n")
-(setq x (List (foo2 1 2 3) (List 1 nil)))
-(list-print x)
+(setq g_x (List (foo2 1 2 3) (List 1 nil)))
+(list-print g_x)
 
 (print "--------\n")
 (if (and (> a 0) (== b 0))
@@ -32,7 +32,6 @@
 (foo5 1 2 3 4 5 6 7 8 9 0)
 
 (print "--list!-\n")
-(defun list (&rest l) l)
 (list-print (list 1 2 3 4 5))
 
 (print "--not----\n")
@@ -155,3 +154,45 @@
 
 (print "---- nth() ---\n")
 (print "@ {}\n" (nth 3 (to-list "123")))
+
+(print "---- lazy and/or () ---\n")
+(defun foo (nr val)
+  ((print "--{}\n" nr)
+   val))
+(print "b:{}\n" (foo 2 true))
+(print "---\n")
+(and (foo 1 false)
+     (foo 2 true))
+(print "---\n")
+(or (foo 1 true)
+    (foo 2 true))
+
+(defun streqq (left right) (== left right))
+
+(print "{}\n" (list-lookup #streqq "1" (to-list "123")))
+
+(print "{}\n" (list-lookup #keq (KV "2" nil)
+			   (list (KV "2" 2)
+				 (KV "1" 1)
+				 (KV "3" 3))))
+
+(print "===> {}\n" (List.data.set (to-list "123") "@@@"))
+
+
+(setq rep-list (list (KV "2" 2)
+		     (KV "1" 1)
+		     (KV "3" 3)))
+
+(KV.value.set (list-lookup #keq
+			   (KV "2" nil)
+			   rep-list)
+	      "###")
+
+(print "===> {}\n" rep-list)
+
+(setq heap-test nil)
+(setq heap-test (heap-put heap-test (KV "a" 1)))
+(setq heap-test (heap-put heap-test (KV "b" 2)))
+(setq heap-test (heap-put heap-test (KV "a" 3)))
+
+(print "heap-test={}\n" heap-test)

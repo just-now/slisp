@@ -54,86 +54,147 @@
   (== (type-of e) type))
 
 (defun ast(e)
-  ((print "\n\n======>e={}\n\n" e)
-   (if (and (and (is e "LList") (LList.seq e))
-	    (is (nth 0 (LList.seq e)) "LList"))
-      ;; if
-      (Seq (map #ast (LList.seq e)))
-      ;; else
-      (if (and (and (is e "LList") (LList.seq e))
- 	       (is (nth 0 (LList.seq e)) "LAtom"))
-	  ;; if
-	  (if (== "setq" (LAtom.val (nth 0 (LList.seq e))))
-	      ;; if
-	      ((print "\n\n ##### {}\n\n" (LAtom.val (nth 1 (LList.seq e))))
-	       (print "\n\n @@@@@ {}\n\n" (ast (nth 2 (LList.seq e))))
-	       e)
-	      ;; else
-	      (if (== "while" (LAtom.val (nth 0 (LList.seq e))))
-		  ;; if
-		  e
-		  ;; else
-		  (if (== "if" (LAtom.val (nth 0 (LList.seq e))))
-		      ;; if
-		      e
-  		      ;; else
-		      (if (and (LAtom.val (nth 0 (LList.seq e)))
-			       (nth 1 (LList.seq e)))
-			  ;; if
-			  e
-  			  ;; else
-			  (if (str-isalpha (nth 0 (LAtom.val e)))
-			      ;; if
-			      e
-  			      ;; else
-			      e)))))
+  (
+   ;; (print "\n\n======>e={}\n\n" e)
+   (setq ret nil)
 
-	  ;; else
-	  e))))
+   ;; case List([List(l1), *l2] as seq):
+   (if (and (not ret)
+	    (and (is e "LList")
+		 (and (LList.seq e)
+		      (is (nth 0 (LList.seq e)) "LList"))))
+       (setq ret (Seq (map #ast (LList.seq e)))))
 
-(print "==>{}\n" (ast la_tree))
+   ;; case List([Atom("setq"), Atom(v), exp]):
+   ;; case List([Atom("while"), cond, exp]):
+   ;; case List([Atom("if"), cond, texp, fexp]):
+   ;; case List([Atom(fun), *params]):
+   (if (and (not ret)
+	    (and (is e "LList")
+		 (and (LList.seq e)
+		      (is (nth 0 (LList.seq e)) "LAtom"))))
 
-;; (defun ast(e)
-;;   (if (and (and (is e "LList") (LList.seq e))
-;; 	   (is (nth 0 (LList.seq e)) "LList"))
+       (
 
-;;       ;; assert(LList.seq == List)
-;;       ((print "LList\n")
-;;        (Seq (map #ast (LList.seq e))))
+	(if (and (not ret)
+		 (== "setq" (LAtom.val (nth 0 (LList.seq e)))))
+	    (
+	     ;; (print "\n\n ##> LEFT  {}\n\n" (LAtom.val (nth 1 (LList.seq e))))
+	     ;; (print "\n\n ##> RIGHT {}\n\n" (ast (nth 2 (LList.seq e))))
 
-;;       (if (and (and (is e "LList") (LList.seq e))
-;; 	       (is (nth 0 (LList.seq e)) "LAtom"))
+	     (setq ret (Assign (LAtom.val (nth 1 (LList.seq e)))
+			       (ast (nth 2 (LList.seq e)))))
+	     ))
 
-;; 	  ;; if
-;; 	  ((setq ret nil)
-;; 	   (if (== "setq" (LAtom.val (nth 0 (LList.seq e))))
-;; 	       ((print "setq\n")
-		;; (setq ret (Assign (LAtom.val (nth 1 (LList.seq e)))
-		;; 		  (ast (nth 2 (LList.seq e)))))))
+	(if (and (not ret)
+		 (== "while" (LAtom.val (nth 0 (LList.seq e)))))
+	    (
+	     (setq ret (While (ast (nth 1 (LList.seq e)))
+			      (ast (nth 2 (LList.seq e)))))
+	     ))
 
-;; 	   (if (== "while" (LAtom.val (nth 0 (LList.seq e))))
-;; 	       ((print "while\n")
-;; 		setq ret (While (ast (nth 1 (LList.seq e)))
-;; 				(ast (nth 2 (LList.seq e))))))
+	(if (and (not ret)
+		 (== "if" (LAtom.val (nth 0 (LList.seq e)))))
+	    (
+	     ;; TODO: implement!
+	     (setq ret e)
+	     ))
 
-;; 	   (if (== "if" (LAtom.val (nth 0 (LList.seq e))))
-;; 	       ((print "if\n")
-;; 		setq ret (If (ast (nth 1 (LList.seq e)))
-;; 			     (ast (nth 2 (LList.seq e)))
-;; 			     (ast (nth 3 (LList.seq e))))))
+	(if (not ret)
+	    (
+	     ;; (print "\n\n ##> OP    {}\n\n" (ast (nth 0 (LList.seq e))))
+	     ;; (print "\n\n ##> LEFT  {}\n\n" (ast (nth 1 (LList.seq e))))
+	     ;; (print "\n\n ##> RIGHT {}\n\n" (ast (nth 2 (LList.seq e))))
+	     (setq ret (Op (ast (nth 0 (LList.seq e)))
+			   (ast (nth 1 (LList.seq e)))
+			   (ast (nth 2 (LList.seq e)))))
+	     ))
 
-;; 	   ret)
+	))
 
-;; 	   ;; else
-;; 	   (if (is e "LAtom")
-;; 	       ;; if
-;; 	       ((print "atom\n")
-;; 		(if (str-isalpha (nth 0 (LAtom.val e)))
-;; 		    (Var (LAtom.val e))
-;; 		    (Const (LAtom.val e))))
-;; 	        ;; else
-;; 	        ((print "setq\n")
-;; 	         e))
+   ;; case Atom(v):
+   (if (and (not ret)
+	    (is e "LAtom"))
+       (
+	(setq ret (if (str-isnumeric (LAtom.val e))
+		      (Const   (LAtom.val e))
+		      (Var (LAtom.val e))))
+	))
 
 
-;; (print "@{}\n" (ast la_tree))
+   ret))
+
+
+
+(setq e_tree (ast la_tree))
+;; (print "{}\n" e_tree)
+(setq heap nil)
+
+;; (print "-------------------\n")
+
+(defun intrp (e)
+  (
+   ;; (print "\n\ntop={}\n\n" e)
+   (setq ret nil)
+
+   (if (and (not ret) (is e "Seq"))
+       (
+	(map #intrp (Seq.seq e))
+	(setq ret true)
+	))
+
+   (if (and (not ret) (is e "Assign"))
+       (
+	(setq heap (heap-put heap (KV (Assign.left e)
+				      (intrp (Assign.right e)))))
+	(setq ret true)
+	))
+
+   (if (and (not ret) (is e "Op"))
+       (
+	;; (print "## op={}\n"    (Var.v (Op.op e)))
+	;; (print "## left={}\n"  (intrp (Op.left e)))
+	;; (print "## right={}\n" (intrp (Op.right e)))
+	(setq op (Var.v (Op.op e)))
+
+	(if (== op "print")
+	    ((setq ret true)
+	     (print "{}, {}\n" (intrp (Op.left e)) (intrp (Op.right e)))))
+
+	(if (== op "+")
+	    (setq ret (+ (intrp (Op.left e)) (intrp (Op.right e)))))
+
+	(if (== op "-")
+	    (setq ret (- (intrp (Op.left e)) (intrp (Op.right e)))))
+
+	(if (== op ">")
+	    (setq ret (> (intrp (Op.left e)) (intrp (Op.right e)))))
+
+	))
+
+   (if (and (not ret) (is e "While"))
+       (
+	(setq condition (While.cond e))
+	(setq body      (While.body e))
+
+	(while (intrp condition)
+	  (intrp body))
+
+	(setq ret true)
+	))
+
+   (if (and (not ret) (is e "Const"))
+       (
+	(setq ret (int (Const.c e)))
+	))
+
+   (if (and (not ret) (is e "Var"))
+       (
+	(setq ret (int (KV.value (heap-get heap (KV (Var.v e) nil)))))
+	))
+
+   ret
+   ))
+
+
+(intrp e_tree)
