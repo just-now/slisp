@@ -24,6 +24,8 @@ ops    = {op: eval(f"lambda a,b: a {op} b") for op in
 
 def intrp(exp, stk=None, clo=None):
     match exp:                                  # NOQA
+        case Skip():
+            return
         case Const(c):
             return c
         case Var(("#", _)) as lfun:
@@ -113,6 +115,8 @@ def ast(e):
             return While(ast(cond), ast(exp))
         case List([Atom("if"), cond, texp, fexp]):
             return If(ast(cond), ast(texp), ast(fexp))
+        case List([Atom("if"), cond, texp]):
+            return If(ast(cond), ast(texp), Skip())
         case List([Atom(fun), *params]):
             aps = [ast(p) for p in params]
             is_op = fun in ops and len(aps) == 2

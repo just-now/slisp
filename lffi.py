@@ -15,12 +15,15 @@ ffit = {
     "str": str, "int": int, "float": float,
     "err?": lambda p: isinstance(p, int),
     "to-list": lambda l: to_list(l),
+    "str-isspace": str.isspace,
+    "str-isalpha": str.isalpha,
 }
 
 
 def check_list_params(ps, ps_nr: int) -> bool:
-    return len(ps) == ps_nr and all([isinstance(p, dict) and
-                                     p["struct"] == "List" for p in ps])
+    return len(ps) == ps_nr and \
+        all([(not p) or (isinstance(p, dict) and
+                         p["struct"] == "List") for p in ps])
 
 
 def to_list(whatever: list):
@@ -42,6 +45,9 @@ def lffi(fun: str, params: list):
     try:
         if fun == "print":
             return print(params[0].format(*params[1:]), end="")
+        elif fun == "type-of":
+            assert(len(params) == 1)
+            return params[0]["struct"]
         elif fun == "append":
             assert(check_list_params(params, 2))
             return to_list(from_list(params[0]) + from_list(params[1]))
@@ -53,4 +59,4 @@ def lffi(fun: str, params: list):
         print(e.with_traceback(), file=sys.stderr)
         return -1
 
-    raise(Exception(f"{fun=} not found"))
+    raise(Exception(f"{fun=} not found, {params=}"))

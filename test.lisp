@@ -1,168 +1,157 @@
-(
- (setq b 0)
- (setq a 10)
+(setq b 0)
+(setq a 10)
 
- (defun foo2 (a b c)
-   (+ a (+ b c)))
+(defun foo2 (a b c)
+  (+ a (+ b c)))
 
- (defun Con-st ()
-   10)
+(defun const () 10)
 
- (print "foo2={}\n" (foo2 1 (+ b a) (foo2 1 2 3)))
- (print "Con-st={}\n" (Con-st))
+(print "foo2={}\n" (foo2 1 (+ b a) (foo2 1 2 3)))
+(print "const={}\n" (const))
 
- (print "--struct-\n")
- (defstruct List
-     data
-     next)
+(print "--prlist-\n")
+(setq x (List (foo2 1 2 3) (List 1 nil)))
+(list-print x)
 
- (print "--prlist-\n")
- (setq x (List (foo2 1 2 3) (List 1 nil)))
- (defun prlist (xy)
-   (
-    ;;(print "xy={}" xy)
-    (while xy
-      ((print "@{} " (List.data xy))
-       (setq xy (List.next xy))))
-    (print "\n")))
+(print "--------\n")
+(if (and (> a 0) (== b 0))
+    (setq c (+ "1\"{}-{}23" "-456"))
+  (setq d 44))
 
- (prlist x)
+(while (> a 0)
+  ((setq a (- a 1))
+   (setq b (+ b 2))))
 
- (print "--------\n")
- (if (and (> a 0) (== b 0))
-     (setq c (+ "1\"{}-{}23" "-456"))
-     (setq d 44))
+(print "b={} \t c={} \n \" const={}\n" b c 3)
 
- (while (> a 0)
-   ((setq a (- a 1))
-    (setq b (+ b 2))))
+(print "--------\n")
+(defun foo5 (x y z &rest p)
+  ((print "{}-{}-{}\n" x y z)
+   (list-print p)))
 
- (print "b={} \t c={} \n \" const={}\n" b c 3)
+(foo5 1 2 3 4 5 6 7 8 9 0)
 
- (print "--------\n")
- (defun foo5 (x y z &rest p)
-   ((print "{}-{}-{}\n" x y z)
-    (prlist p)))
+(print "--list!-\n")
+(defun list (&rest l) l)
+(list-print (list 1 2 3 4 5))
 
- (foo5 1 2 3 4 5 6 7 8 9 0)
+(print "--not----\n")
+(print "f:{}, t:{}\n" (not false) (not true))
 
- (print "--list!-\n")
- (defun list (&rest l) l)
- (prlist (list 1 2 3 4 5))
+(print "--map--\n")
+(defun plus10 (a) (+ a 10))
+(list-print (map #plus10 (list 1 2 3 4 5)))
 
- (print "--not----\n")
- (defun not (x)
-   (if x false true))
+(print "--filter--\n")
+(defun gt3 (a) (> a 3))
+(list-print (filter #gt3 (list 1 2 3 4 5)))
 
- (print "f:{}, t:{}\n" (not false) (not true))
+(print "--lambda-\n")
+(setq lam1 (lambda (x) (+ 5 x)))
+(print "@@{}\n" (funcall lam1 10))
+(print "@@{}\n"
+       (funcall (lambda (x y) (+ y (+ 10 x))) 10 20))
 
- (print "--map--\n")
- (defun plus10 (a) (+ a 10))
- (defun map (pred l)
-   (if l
-       (List (funcall pred (List.data l))
-             (map pred (List.next l)))
-        nil))
- (prlist (map #plus10 (list 1 2 3 4 5)))
+(funcall (lambda (&rest p) (list-print p)) 1 2 3 4 5)
+(list-print (map (lambda (x) (+ x 10))
+                 (list 1 2 3 4 5)))
 
- (print "--filter--\n")
- (defun filter (pred l)
-   (if l
-       (if (funcall pred (List.data l))
-           (List (List.data l) (filter pred (List.next l)))
-           (filter pred (List.next l)))
-        nil))
- (defun gt3 (a) (> a 3))
- (prlist (filter #gt3 (list 1 2 3 4 5)))
+(print "--append(ffi)--\n")
+(list-print (append
+             (list 1 2 3 4 5)
+             (list 10 20 30)))
 
- (print "--lambda-\n")
- (setq lam1 (lambda (x) (+ 5 x)))
- (print "@@{}\n" (funcall lam1 10))
- (print "@@{}\n"
-        (funcall (lambda (x y) (+ y (+ 10 x))) 10 20))
+(print "--curry--\n")
+(defun addx (a b)
+  (+ a b))
 
- (funcall (lambda (&rest p) (prlist p)) 1 2 3 4 5)
- (prlist (map (lambda (x) (+ x 10))
-                (list 1 2 3 4 5)))
+(print "@@{}\n" (funcall (curry #addx 2) (+ 2 3)))
 
- (print "--append(ffi)--\n")
- (prlist (append
-          (list 1 2 3 4 5)
-          (list 10 20 30)))
+(print "--compose--\n")
+(print "@@{}\n" (funcall (compose (lambda (x) (* x 10))
+				  (curry #addx 10)
+				  (lambda (x) (/ x 10)))
+                         13))
 
- (print "--curry--\n")
- (defun curry (fn &rest args)
-   (lambda (&rest remaining-args)
-     (apply fn (append args remaining-args))))
+(print "----tree---\n")
+(defstruct Tree
+  data
+  left
+  right)
+(setq tree (Tree 1
+		 (Tree 2
+		       (Tree 22 nil nil)
+		       (Tree 23 nil nil))
+		 (Tree 3
+		       (Tree 32 nil nil)
+		       (Tree 33 nil nil))))
+(defun prtree (node)
+  (if (not node)
+      nil
+    ((print "@@{} " (Tree.data node))
+     (prtree (Tree.left  node))
+     (prtree (Tree.right node)))))
 
- (defun addx (a b)
-   (+ a b))
+(prtree tree)
+(print "\n")
 
- (print "@@{}\n" (funcall (curry #addx 2) (+ 2 3)))
+(print "---- io/r ---\n")
+(setq file (file-open "test.lisp" "r"))
+(setq cont (file-read file 64))
+(print "{}\n" cont)
+(file-close file)
 
- (print "--compose--\n")
- (defun compose (&rest foos)
-   (lambda (x)
-     ((while foos
-        ((setq foo  (List.data foos))
-         (setq x    (funcall foo x))
-         (setq foos (List.next foos))))
-      x)))
+(print "---- io/w ---\n")
+(setq file (file-open "out.xxx" "w"))
+(print "err?={}\n" (err? file))
+(file-write file cont)
+(file-write file (format "\n~Q.E.D~{}\n" 7012022))
+(file-close file)
 
- (print "@@{}\n" (funcall (compose (lambda (x) (* x 10))
-				   (curry #addx 10)
-				   (lambda (x) (/ x 10)))
-                          13))
+(print "---- io-fail ---\n")
+(setq file (file-open "xxx" "r"))
+(print "err?={}\n" (err? file))
+(print "result=-{}\n" file)
 
- (print "----tree---\n")
- (defstruct Tree
-   data
-   left
-   right)
- (setq tree (Tree 1
-		  (Tree 2
-			(Tree 22 nil nil)
-			(Tree 23 nil nil))
-		  (Tree 3
-			(Tree 32 nil nil)
-			(Tree 33 nil nil))))
- (defun prtree (node)
-   (if (not node)
-       nil
-       ((print "@@{} " (Tree.data node))
-	(prtree (Tree.left  node))
-	(prtree (Tree.right node)))))
+(print "---- str/list ---\n")
+(list-print (filter (lambda (x) (> x 5))
+		    (map (compose #int #float)
+			 (to-list "1234567890"))))
 
- (prtree tree)
- (print "\n")
+(print "@{}\n" (str-join "" (to-list "1234567890")))
 
- (print "---- io/r ---\n")
- (setq file (file-open "test.lisp" "r"))
- (setq cont (file-read file 64))
- (print "{}\n" cont)
- (file-close file)
+(list-print (str-split "one1 two2 three3"))
 
- (print "---- io/w ---\n")
- (setq file (file-open "out.xxx" "w"))
- (print "err?={}\n" (err? file))
- (file-write file cont)
- (file-write file (format "\n~Q.E.D~{}\n" 7012022))
- (file-close file)
+(print "---- int/list ---\n")
+(print "@{}\n" (str-join "" (map #str (list 1 2.2 3 4 5 6))))
 
- (print "---- io-fail ---\n")
- (setq file (file-open "xxx" "r"))
- (print "err?={}\n" (err? file))
- (print "result=-{}\n" file)
+(print "---- drop/take ---\n")
+(setq str1 "     (a 1 2)")
+;;(setq str1 "          ")
+(print "@'{}'\n" (nth 6 (to-list str1)))
+(print "dw='{}'\n" (str-join "" (dropwhile #str-isspace
+					   (to-list str1))))
 
- (print "---- str/list ---\n")
- (prlist (filter (lambda (x) (> x 5))
-		 (map (compose #int #float)
-		      (to-list "1234567890"))))
+(print "s='{}'\n" str1)
+(print "tw='{}'\n" (str-join "" (takewhile #str-isspace
+					   (to-list str1))))
 
- (print "@{}\n" (str-join "" (to-list "1234567890")))
+(print "from='{}'\n" (str-join "" (from 1
+					(to-list "-@-1@2-"))))
 
- (prlist (str-split "one1 two2 three3"))
+(print "---- io-new/r ---\n")
+(setq file (file-open "calc.test.lisp" "r"))
+(setq cont (file-read file))
+(print "{}\n" cont)
+(file-close file)
 
- (print "---- int/list ---\n")
- (print "@{}\n" (str-join "" (map #str (list 1 2.2 3 4 5 6))))
-)
+
+(print "---- if-skip ---\n")
+(if false
+    (print "1\n"))
+
+(print "---- type ---\n")
+(print "@ {}\n" (type-of (List 1 nil)))
+
+(print "---- nth() ---\n")
+(print "@ {}\n" (nth 3 (to-list "123")))
