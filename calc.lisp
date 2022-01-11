@@ -105,8 +105,6 @@
 		 (str-isalpha (nth 0 (to-list (Var.v (ast (nth 0 (LList.seq e))))))))
 	    (
 	     ;; (print "\n\n ##> FUN    {}\n\n" (ast (nth 0 (LList.seq e))))
-	     ;; (print "\n\n ##> LEFT  {}\n\n" (ast (nth 1 (LList.seq e))))
-	     ;; (print "\n\n ##> RIGHT {}\n\n" (ast (nth 2 (LList.seq e))))
 	     (setq ret (Fun (Var.v (ast (nth 0 (LList.seq e))))
 			    (map #ast (from 1 (LList.seq e)))))
 	     ))
