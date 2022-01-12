@@ -1,9 +1,11 @@
 all: clean
-	(echo "("; cat lib.lisp test.lisp; echo ")") \
+	(echo "("; cat lisp-src/lib.lisp lisp-src/test.lisp; echo ")") \
 		| sed "s/;;.*//" | ./python3.10 main.py
+	make clean
+
 clean:
 	rm -rf out.xxx
 
 calc:
-	(echo "("; cat lib.lisp calc.lisp; echo ")") \
+	(echo "("; cat lisp-src/lib.lisp lisp-src/calc.lisp; echo ")") \
 		| sed "s/;;.*//" | ./python3.10 main.py

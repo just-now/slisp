@@ -95,7 +95,7 @@
 (print "\n")
 
 (print "---- io/r ---\n")
-(setq file (file-open "test.lisp" "r"))
+(setq file (file-open "lisp-src/test.lisp" "r"))
 (setq cont (file-read file 64))
 (print "{}\n" cont)
 (file-close file)
@@ -139,7 +139,7 @@
 					(to-list "-@-1@2-"))))
 
 (print "---- io-new/r ---\n")
-(setq file (file-open "calc.test.lisp" "r"))
+(setq file (file-open "lisp-src/calc.test.lisp" "r"))
 (setq cont (file-read file))
 (print "{}\n" cont)
 (file-close file)

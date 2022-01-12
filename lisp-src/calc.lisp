@@ -44,7 +44,7 @@
 		       (dropwhile #isatom s)))))))
 
 
-(setq file (file-open "calc.test.lisp" "r"))
+(setq file (file-open "lisp-src/calc.test.lisp" "r"))
 (setq cont (file-read file))
 (print "{}\n" cont)
 (file-close file)
