@@ -196,3 +196,7 @@
 (setq heap-test (heap-put heap-test (KV "a" 3)))
 
 (print "heap-test={}\n" heap-test)
+
+(print "-----\n")
+(print "len={}\n" (list-len (to-list "12345")))
+(print "append={}\n" (str-join "" (list-append (to-list "6789") (to-list "12345"))))

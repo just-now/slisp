@@ -39,9 +39,55 @@
        heap)
       (append heap (list kv))))
 
+(defun list-head (l) l)
+
+(defun list-tail (l)
+  ((while (List.next l)
+     (setq l (List.next l)))
+   l))
+
+(defun list-len (l)
+  ((setq len 0)
+   (while l
+     ((setq l (List.next l))
+      (setq len (+ 1 len))))
+   len))
+
+(defun list-append (l1 l2)
+  ((setq ret nil)
+
+   (if (and (not ret) (and (not l1)
+			   (not l2)))
+       (setq ret nil))
+
+   (if (and (not ret) (not l1))
+       (setq ret l2))
+
+   (if (and (not ret) (not l2))
+       (setq ret l1))
+
+   (if (not ret)
+       ((List.next.set (list-tail l1) (list-head l2))
+	(setq ret l1)))
+
+   ret))
+
+(defun append (l1 l2)
+  (list-append l1 l2))
+
+(defun len (l)
+  (list-len l))
+
 ;; ==================== std library ====================
+
 (defun not (x)
   (if x false true))
+
+(defun inc (i)
+  (+ i 1))
+
+(defun dec (i)
+  (- i 1))
 
 (defun map (pred l)
   (if l

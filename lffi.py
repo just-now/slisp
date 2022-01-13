@@ -49,9 +49,6 @@ def lffi(fun: str, params: list):
         elif fun == "type-of":
             assert(len(params) == 1)
             return params[0]["struct"]
-        elif fun == "append":
-            assert(check_list_params(params, 2))
-            return to_list(from_list(params[0]) + from_list(params[1]))
         elif fun in ffit:
             return ffit[fun](*params)
     except OSError as e:
