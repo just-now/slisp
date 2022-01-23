@@ -41,7 +41,6 @@ def intrp(exp, stk=None, clo=None):
                 right = intrp(r, stk, clo)
             return ops[op](left, right)
         case Assign(l, r):
-            # out = stk if stk else heap
             out = heap if l in heap else (stk if stk else heap)
             out[l] = intrp(r, stk, clo)
             return
