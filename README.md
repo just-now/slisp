@@ -1,3 +1,6 @@
+![example workflow](https://github.com/just-now/slisp/actions/workflows/makefile.yml/badge.svg)
+
+
 **A simple lisp interpreter**
 
 General workflow:
