@@ -1,6 +1,6 @@
 all: clean
 	(echo "("; cat lisp-src/lib.lisp lisp-src/test.lisp; echo ")") \
-		| sed "s/;;.*//" | ./python3.10 main.py
+		| sed "s/;;.*//" | python3 main.py
 	make clean
 
 clean:
@@ -8,4 +8,4 @@ clean:
 
 calc:
 	(echo "("; cat lisp-src/lib.lisp lisp-src/calc.lisp; echo ")") \
-		| sed "s/;;.*//" | ./python3.10 main.py
+		| sed "s/;;.*//" | python3 main.py
